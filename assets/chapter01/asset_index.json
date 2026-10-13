@@ -1,0 +1,327 @@
+{
+  "storybook_blank": {
+    "region": [
+      0,
+      0,
+      1672,
+      941
+    ],
+    "transparent": false,
+    "source_size": [
+      1672,
+      941
+    ]
+  },
+  "room_wall": {
+    "region": [
+      0,
+      0,
+      1672,
+      941
+    ],
+    "transparent": false,
+    "source_size": [
+      1672,
+      941
+    ]
+  },
+  "tabletop": {
+    "region": [
+      4,
+      228,
+      2164,
+      267
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ]
+  },
+  "regular_soldier": {
+    "region": [
+      271,
+      1,
+      483,
+      1517
+    ],
+    "transparent": true,
+    "source_size": [
+      1024,
+      1536
+    ]
+  },
+  "box_back": {
+    "region": [
+      23,
+      28,
+      1495,
+      944
+    ],
+    "transparent": true,
+    "source_size": [
+      1536,
+      1024
+    ]
+  },
+  "box_front": {
+    "region": [
+      1,
+      210,
+      2171,
+      330
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ]
+  },
+  "small_block": {
+    "region": [
+      52,
+      95,
+      2063,
+      555
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ]
+  },
+  "wooden_box": {
+    "region": [
+      43,
+      80,
+      1453,
+      880
+    ],
+    "transparent": true,
+    "source_size": [
+      1536,
+      1024
+    ]
+  },
+  "child_forearm": {
+    "region": [
+      136,
+      0,
+      452,
+      2127
+    ],
+    "transparent": true,
+    "source_size": [
+      724,
+      2172
+    ]
+  },
+  "child_palm": {
+    "region": [
+      25,
+      158,
+      975,
+      1225
+    ],
+    "transparent": true,
+    "source_size": [
+      1024,
+      1536
+    ]
+  },
+  "child_index": {
+    "region": [
+      79,
+      224,
+      563,
+      1709
+    ],
+    "transparent": true,
+    "source_size": [
+      724,
+      2172
+    ]
+  },
+  "child_index_tip": {
+    "region": [
+      169,
+      136,
+      578,
+      1443
+    ],
+    "transparent": true,
+    "source_size": [
+      887,
+      1774
+    ]
+  },
+  "child_thumb": {
+    "region": [
+      173,
+      107,
+      588,
+      1502
+    ],
+    "transparent": true,
+    "source_size": [
+      887,
+      1774
+    ]
+  },
+  "child_fingers": {
+    "region": [
+      132,
+      182,
+      778,
+      1195
+    ],
+    "transparent": true,
+    "source_size": [
+      1024,
+      1536
+    ]
+  },
+  "books_platform": {
+    "region": [
+      6,
+      124,
+      1974,
+      613
+    ],
+    "transparent": true,
+    "source_size": [
+      1983,
+      793
+    ]
+  },
+  "paper_castle": {
+    "region": [
+      9,
+      6,
+      1519,
+      986
+    ],
+    "transparent": true,
+    "source_size": [
+      1536,
+      1024
+    ]
+  },
+  "paper_dancer": {
+    "region": [
+      25,
+      57,
+      999,
+      1420
+    ],
+    "transparent": true,
+    "source_size": [
+      1024,
+      1536
+    ]
+  },
+  "thread_spool": {
+    "region": [
+      34,
+      127,
+      979,
+      1224
+    ],
+    "transparent": true,
+    "source_size": [
+      1024,
+      1536
+    ]
+  },
+  "loose_buttons": {
+    "region": [
+      230,
+      27,
+      1114,
+      956
+    ],
+    "transparent": true,
+    "source_size": [
+      1536,
+      1024
+    ]
+  },
+  "brass_pin": {
+    "region": [
+      368,
+      358,
+      531,
+      515
+    ],
+    "transparent": true,
+    "source_size": [
+      1263,
+      1245
+    ]
+  },
+  "castle_wall": {
+    "region": [
+      0,
+      0,
+      1672,
+      941
+    ],
+    "transparent": false,
+    "source_size": [
+      1672,
+      941
+    ]
+  },
+  "desk_surface": {
+    "region": [
+      0,
+      0,
+      2164,
+      727
+    ],
+    "transparent": false,
+    "source_size": [
+      2164,
+      727
+    ]
+  },
+  "child_hand_pinch": {
+    "region": [
+      237,
+      0,
+      560,
+      1400
+    ],
+    "transparent": true,
+    "source_size": [
+      1024,
+      1536
+    ]
+  },
+  "room_panorama": {
+    "region": [
+      0,
+      0,
+      2172,
+      724
+    ],
+    "transparent": false,
+    "source_size": [
+      2172,
+      724
+    ]
+  },
+  "desk_apron": {
+    "region": [
+      0,
+      0,
+      2172,
+      724
+    ],
+    "transparent": false,
+    "source_size": [
+      2172,
+      724
+    ]
+  }
+}

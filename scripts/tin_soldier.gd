@@ -8,6 +8,10 @@ extends CharacterBody2D
 @export var charge_duration: float = 0.35
 @export var landing_lock: float = 0.06
 @export var landing_recovery: float = 0.26
+@export var wind_enabled: bool = true
+@export var world_left: float = 20.0
+@export var world_right: float = 1260.0
+@export var respawn_position: Vector2 = Vector2(140,648)
 
 var state: String = "站立"
 var facing: float = 1.0
@@ -48,7 +52,7 @@ func _physics_process(delta: float) -> void:
 	last_landing_locked = locked
 	recovery_time = maxf(0.0, recovery_time - delta)
 	braced = grounded and Input.is_action_pressed("brace") and not locked
-	in_wind = position.x > 625.0 and position.x < 965.0
+	in_wind = wind_enabled and position.x > 625.0 and position.x < 965.0
 	wind = (310.0 + 190.0 * sin(clock * 1.8)) if in_wind else 0.0
 	if direction != 0.0 and not braced and not preparing and not locked:
 		facing = signf(direction)
@@ -111,8 +115,8 @@ func _physics_process(delta: float) -> void:
 		state = "走路"
 	else:
 		state = "站立"
-	if position.y > 850.0 or position.x < 20.0 or position.x > 1260.0:
-		reset_at(Vector2(140, 648))
+	if position.y > 850.0 or position.x < world_left or position.x > world_right:
+		reset_at(respawn_position)
 	body_art.queue_redraw()
 
 func reset_at(at: Vector2) -> void:
@@ -123,6 +127,25 @@ func reset_at(at: Vector2) -> void:
 	recovery_time = 0.0
 	big_in_flight = false
 	braced = false
+
+func hold_standing() -> void:
+	# End the playable movement before the meeting shot, including residual landing poses.
+	set_physics_process(false)
+	velocity = Vector2.ZERO
+	state = "站立"
+	facing = 1.0
+	preparing = false
+	charge_time = 0.0
+	recovery_time = 0.0
+	big_in_flight = false
+	braced = false
+	last_landing_locked = false
+	wind = 0.0
+	in_wind = false
+	body_art.rotation = 0.0
+	body_art.walk_phase = 0.0
+	body_art.salute_weight = 0.0
+	body_art._process(0.0)
 
 func _mcp_state() -> Dictionary:
 	return {"action": state, "grounded": is_on_floor(), "braced": braced, "preparing": preparing, "charge": snappedf(charge_time, 0.01), "recovery": snappedf(recovery_time, 0.01), "last_jump": last_jump, "small_jumps": small_jumps, "big_jumps": big_jumps, "wind": snappedf(wind, 0.1), "landing_locked": last_landing_locked}

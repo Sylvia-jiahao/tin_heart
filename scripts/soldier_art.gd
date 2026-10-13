@@ -94,22 +94,11 @@ func _piece(parent: Node2D, asset: String, dimensions: Vector2, at: Vector2) -> 
 	return sprite
 
 func _pin(parent: Node2D) -> void:
-	var rim := Polygon2D.new()
-	rim.name = "BrassPinRim"
-	var face := Polygon2D.new()
-	face.name = "BrassPin"
-	var outer := PackedVector2Array()
-	var inner := PackedVector2Array()
-	for i in range(12):
-		var p := Vector2.from_angle(float(i)/12.0*TAU)
-		outer.append(p*2.5)
-		inner.append(p*1.6)
-	rim.polygon = outer
-	rim.color = Color("695039")
-	face.polygon = inner
-	face.color = Color("d9b369")
-	parent.add_child(rim)
-	parent.add_child(face)
+	var art = load("res://scripts/chapter_art.gd")
+	var pin: Sprite2D = art.sprite("brass_pin",Vector2(5,5))
+	pin.name = "BrassPin"
+	pin.position = Vector2(-2.5,-2.5)
+	parent.add_child(pin)
 
 func _process(delta: float) -> void:
 	if not is_instance_valid(actor):
