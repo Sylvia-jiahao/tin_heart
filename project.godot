@@ -1,0 +1,52 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Tin Heart"
+run/main_scene="res://scenes/action_demo.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+run/max_fps=120
+config/icon="res://icon.svg"
+
+[autoload]
+
+MCPGameBridge="res://addons/godot_mcp/game_bridge/mcp_game_bridge.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=800
+window/size/window_width_override=1280
+window/size/window_height_override=800
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg")
+
+[godot_mcp]
+
+bind_mode=0
+custom_bind_ip=""
+port_override_enabled=false
+port_override=6550
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
+
+[rendering]
+
+rendering_device/driver.windows="d3d12"
+gl_compatibility/driver.windows="opengl3_angle"
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
