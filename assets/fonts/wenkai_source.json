@@ -1,0 +1,9 @@
+{
+  "font": "LXGW WenKai Regular",
+  "purpose": "Fallback for characters missing in NaniFont, including 叠 and 摆",
+  "official_repository": "https://github.com/lxgw/LxgwWenKai",
+  "license": "SIL Open Font License 1.1",
+  "download_url": "https://raw.githubusercontent.com/lxgw/LxgwWenKai/main/fonts/TTF/LXGWWenKai-Regular.ttf",
+  "retrieved": "2026-10-14",
+  "sha256": "bf73f995c05f3f7baf7840b9d76d8d9678c8b150a020946a394ca63c67ed1350"
+}

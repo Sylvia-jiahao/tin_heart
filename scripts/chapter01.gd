@@ -1,16 +1,16 @@
 extends Node2D
 
 const ART = preload("res://scripts/chapter_art.gd")
-const SOLDIER = preload("res://scripts/tin_soldier.gd")
 const HAND = preload("res://scripts/child_hand.gd")
+const PLACE_INTERVAL: float=0.75
+const INTRO_DURATION: float=33.0
+var cg_time: float=0.0
+var hand: Node2D
+const SOLDIER = preload("res://scripts/tin_soldier.gd")
 const JOURNEY = preload("res://scripts/tabletop_journey.gd")
 const WIND = preload("res://scripts/wind_effect.gd")
-const INTRO_DURATION: float = 33.0
-const PLACE_INTERVAL: float = 0.75
-var phase: String = "cinematic"
-var cg_time: float = 0.0
+var phase: String = "book_opening"
 var player: CharacterBody2D
-var hand: Node2D
 var camera: Camera2D
 var soldiers: Array[Node2D] = []
 var page: Sprite2D
@@ -42,8 +42,11 @@ var brace_taught: bool=false
 var brace_hold: float=0.0
 var brace_gate: StaticBody2D
 var brace_gate_art: Sprite2D
+var book_opening: CanvasLayer
+var opening_time: float=0.0
 
 func _ready() -> void:
+	ChapterMusic.play_opening(true)
 	if get_tree().get_meta("tinheart_journey_finished",false):
 		journey_enabled=false
 	add_to_group("mcp_watch")
@@ -58,7 +61,8 @@ func _ready() -> void:
 	var desk_width: float=3460.0 if journey_enabled else 5000.0
 	_picture(self,"desk_surface",Vector2(desk_width,175),Vector2(-1000,475),-5)
 	_picture(self,"desk_apron",Vector2(desk_width,450),Vector2(-1000,650),-4)
-	_picture(self,"tabletop",Vector2(desk_width,70),Vector2(-1000,650),21)
+	# Objects resting on the desk must cover its rim, including the exit books.
+	_picture(self,"tabletop",Vector2(desk_width,70),Vector2(-1000,650),3)
 	_solid(Rect2(0,650,2400,150))
 	_picture(self,"box_back",Vector2(310,205),Vector2(75,445),0)
 	_picture(self,"box_front",Vector2(310,28),Vector2(75,626),14)
@@ -109,8 +113,9 @@ func _ready() -> void:
 	dancer_axis.visible=not journey_enabled
 	# Offset the painting so its supporting toe remains at the axis during a flip.
 	dancer_art = _picture(dancer_axis,"paper_dancer",DANCER_SIZE,-DANCER_SUPPORT_POINT,0)
-	hand = HAND.new()
-	hand.z_index = 50
+	hand=HAND.new()
+	hand.z_index=50
+	hand.visible=false
 	add_child(hand)
 	HUD()
 	camera = Camera2D.new()
@@ -125,6 +130,11 @@ func _ready() -> void:
 		journey.position=Vector2(2460,0)
 		add_child(journey)
 		player.world_right=45000
+	if not get_tree().get_meta("tinheart_journey_finished",false):
+		ui_root.visible=false
+		camera.position=Vector2(checkpoint.x,440)
+		book_opening=load("res://scripts/book_opening.gd").new()
+		add_child(book_opening)
 	await get_tree().physics_frame
 	await get_tree().physics_frame
 	player.set_physics_process(false)
@@ -139,7 +149,7 @@ func _ready() -> void:
 		await get_tree().physics_frame
 		await get_tree().physics_frame
 	else:
-		_cinematic()
+		phase="book_opening"
 
 func _player() -> void:
 	player = SOLDIER.new()
@@ -184,15 +194,17 @@ func HUD() -> void:
 	ui.layer = 100
 	add_child(ui)
 	page = _picture(ui,"storybook_blank",Vector2(1280,800),Vector2.ZERO,0)
+	page.scale=get_viewport_rect().size/page.texture.get_size()
+	var page_material:=ShaderMaterial.new()
+	page_material.shader=load("res://assets/cinematics/paper.gdshader")
+	page.material=page_material
 	title = _label(ui,"第一章  纸城堡",Vector2(100,270),1080,49)
 	subtitle = _label(ui,"第二十五个锡兵",Vector2(100,355),1080,28)
 	# Typography is rendered live; the paper underneath is generated artwork.
-	narration = _label(ui,"",Vector2(800,315),450,26)
+	narration = _label(ui,"",Vector2(800,315),450,30)
 	narration.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	narration.add_theme_constant_override("outline_size",3)
-	narration.add_theme_color_override("font_outline_color",Color("efe4cd"))
 	narration.z_index = 2
-	help = _label(ui,"Enter 跳过演出   ·   C 继续旅程   ·   K 跳过教学",Vector2(640,28),620,16)
+	help = _label(ui,"Enter 跳过演出   ·   C 继续旅程   ·   K 跳过教学",Vector2(640,28),620,18)
 	help.z_index = 3
 	tutorial_wind=WIND.new()
 	ui.add_child(tutorial_wind)
@@ -204,7 +216,9 @@ func _label(parent: Node, text: String, at: Vector2, width: float, size: int) ->
 	label.size.x = width
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.add_theme_font_size_override("font_size",size)
-	label.add_theme_color_override("font_color",Color("4d3e32"))
+	label.add_theme_color_override("font_color",Color.BLACK)
+	label.add_theme_color_override("font_outline_color",Color.WHITE)
+	label.add_theme_constant_override("outline_size",4)
 	parent.add_child(label)
 	return label
 
@@ -215,6 +229,8 @@ func _process(delta: float) -> void:
 		return
 	if Input.is_action_just_pressed("continue_journey"):
 		if is_instance_valid(journey):
+			if is_instance_valid(book_opening): book_opening.visible=false
+			ChapterMusic.play_exploration()
 			phase="journey"
 			ui_root.visible=false
 			_prepare_journey_actor()
@@ -226,26 +242,38 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("replay_chapter"):
 		get_tree().reload_current_scene()
 		return
-	if phase == "cinematic":
-		cg_time += delta
-		player.clock += delta
-		_cinematic()
-		if cg_time >= INTRO_DURATION or Input.is_action_just_pressed("skip_intro"):
+	if phase=="book_opening":
+		opening_time+=delta
+		book_opening.update_shot(opening_time)
+		if opening_time>=13.5 and cg_time<4.0:
+			_prepare_box_cinematic()
+		if Input.is_action_just_pressed("skip_intro"):
 			begin_play()
-	else:
-		_gameplay(delta)
+		elif opening_time>=book_opening.DURATION:
+			book_opening.visible=false
+			ui_root.visible=true
+			phase="cinematic"
+		return
+	if phase=="cinematic":
+		cg_time+=delta
+		player.clock+=delta
+		_cinematic()
+		if cg_time>=INTRO_DURATION or Input.is_action_just_pressed("skip_intro"):
+			begin_play()
+		return
+	_gameplay(delta)
 
 func _source(i: int) -> Vector2:
 	return Vector2(160+(i%5)*46,535+(i/5)*21)
-
-func _destination(i: int) -> Vector2:
-	return Vector2(465+(i%6)*61,560+(i/6)*30)
 
 func _box_pose(i: int) -> void:
 	soldiers[i].position = _source(i)
 	soldiers[i].rotation = -PI/2.0
 	soldiers[i].scale = Vector2(0.42,0.42)
 	soldiers[i].z_index = 6
+
+func _destination(i: int) -> Vector2:
+	return Vector2(465+(i%6)*61,560+(i/6)*30)
 
 func _table_pose(i: int) -> void:
 	soldiers[i].position = _destination(i)
@@ -261,9 +289,10 @@ func _cinematic() -> void:
 	var t := cg_time
 	narration.position = Vector2(800,315)
 	narration.size.x = 450
-	page.modulate.a = 1.0-_ease((t-2.5)/2.0)
-	title.modulate.a = 1.0-_ease((t-2.8)/1.0)
-	subtitle.modulate.a = title.modulate.a
+	# The new book already supplied the title page. Only play the toy-placement shot.
+	page.visible=false
+	title.visible=false
+	subtitle.visible=false
 	placed_count = clampi(int((t-4.0)/PLACE_INTERVAL),0,24)
 	for i in range(24):
 		if i < placed_count:
@@ -326,12 +355,22 @@ func _cinematic() -> void:
 		narration.position = Vector2(880,100)
 		narration.size.x = 350
 
+func _prepare_box_cinematic() -> void:
+	cg_time=4.0
+	ui_root.visible=false
+	player.set_physics_process(false)
+	ChapterMusic.play_exploration()
+	_cinematic()
+
 func begin_play() -> void:
+	if is_instance_valid(book_opening): book_opening.visible=false
+	ChapterMusic.play_exploration()
+	hand.visible=false
 	phase = "tutorial"
 	placed_count = 24
 	for i in range(24):
 		_table_pose(i)
-	hand.visible = false
+	ui_root.visible=true
 	page.visible = false
 	title.visible = false
 	subtitle.visible = false
@@ -357,7 +396,7 @@ func _gameplay(delta: float) -> void:
 		small_cleared = true
 	if (player.is_on_floor() and player.position.x >= 1270 and player.position.x <= 1470 and player.position.y <= 521) or player.position.x > 1470:
 		big_cleared = true
-	narration.position = Vector2(80,165)
+	narration.position = Vector2(400 if player.position.x<1000 else 80,165)
 	narration.size.x = 620
 	if big_cleared:
 		narration.text = "沿着书架，还有一条很长的小路。\n跳上旧书叠成的平台。" if journey_enabled else "再向前，便是纸城堡。\n跳上旧书叠成的平台。"
@@ -368,12 +407,12 @@ func _gameplay(delta: float) -> void:
 	elif not small_cleared:
 		narration.text = "一块小积木挡住了去路。\n短按空格，松开小跳。"
 	if journey_enabled and big_cleared:
-		var in_lesson: bool=player.position.x>1730 and player.position.x<2060 and player.is_on_floor() and player.position.y<490
+		var in_lesson: bool=player.position.x>1730 and player.position.x<2060 and player.position.y<490
 		var gust: float=650.0*(0.65+0.35*sin(player.clock*1.5)) if in_lesson and not brace_taught else 0.0
 		player.external_wind_enabled=true
 		player.external_wind=gust
 		tutorial_wind.strength=gust
-		if in_lesson and player.braced and gust>150:
+		if in_lesson and player.is_on_floor() and player.braced and gust>150:
 			brace_hold+=delta
 		if brace_hold>=1.2 and not brace_taught:
 			brace_taught=true
@@ -393,6 +432,7 @@ func _gameplay(delta: float) -> void:
 			return
 		completed = true
 		phase = "castle_arrival"
+		ChapterMusic.play_dance()
 		player.hold_standing()
 		meeting_camera_start = camera.position
 		meeting_zoom_start = camera.zoom
@@ -400,6 +440,8 @@ func _gameplay(delta: float) -> void:
 		_meeting_shot(delta)
 
 func _enter_journey(skip_tutorial: bool) -> void:
+	if is_instance_valid(book_opening): book_opening.visible=false
+	ChapterMusic.play_exploration()
 	phase="journey"
 	ui_root.visible=false
 	_prepare_journey_actor()
@@ -411,6 +453,7 @@ func _enter_journey(skip_tutorial: bool) -> void:
 	journey._save()
 
 func _prepare_journey_actor() -> void:
+	hand.visible=false
 	player.scale=Vector2.ONE
 	player.rotation=0.0
 	player.body_art.rotation=0.0
@@ -439,4 +482,4 @@ func _dance(time: float) -> void:
 	dancer_axis.scale.x = horizontal
 
 func _mcp_state() -> Dictionary:
-	return {"phase":phase,"cg_time":snappedf(cg_time,0.1),"placed_soldiers":placed_count,"total_soldiers":25,"hand_visible":hand.visible,"small_cleared":small_cleared,"big_cleared":big_cleared,"completed":completed}
+	return {"phase":phase,"opening_time":snappedf(opening_time,0.1),"placed_soldiers":placed_count,"total_soldiers":25,"small_cleared":small_cleared,"big_cleared":big_cleared,"completed":completed}

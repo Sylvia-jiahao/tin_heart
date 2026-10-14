@@ -39,29 +39,14 @@ func verify() -> void:
 	await frames(6)
 	scene.set_process(false)
 	check(scene.soldiers.size()==24,"24 brothers plus the one-legged player")
-	for time in [0.0,4.0,8.0,16.0,22.0,24.0,26.6,28.6,33.0]:
-		scene.cg_time = time
-		scene._cinematic()
-	check(scene.placed_count==24,"all brothers placed before control handoff")
-	check(scene.player.rotation==0 and scene.player.scale==Vector2.ONE,"last soldier upright and full size")
-	check(absf(scene.player.body_art.rotation)<0.001,"two wobbles end in a stable pose")
-	scene.cg_time=24.0
-	scene._cinematic()
-	check(scene.camera.zoom.x>2.0 and scene.camera.position.x<scene.checkpoint.x,"last soldier is magnified while the hand carries it")
-	scene.cg_time=28.4
-	scene._cinematic()
-	check(scene.camera.zoom.x>2.0 and absf(scene.player.body_art.rotation)<0.001,"close-up holds until the soldier stands steadily")
-	scene.cg_time=33.0
-	scene._cinematic()
-	check(scene.camera.zoom.is_equal_approx(Vector2.ONE) and scene.camera.position.is_equal_approx(Vector2(scene.checkpoint.x,440)),"camera returns to normal before control handoff")
-	scene.cg_time=8.0
+	check(scene.phase=="book_opening","new book supplies the title page")
 	scene.set_process(true)
 	Input.action_press("skip_intro")
 	await process_frame
 	await process_frame
 	Input.action_release("skip_intro")
 	scene.set_process(false)
-	check(scene.phase=="tutorial" and scene.placed_count==24 and not scene.hand.visible,"Enter skip gives a complete playable state")
+	check(scene.phase=="tutorial" and scene.placed_count==24 and not scene.book_opening.visible,"Enter skip gives a complete playable state")
 	if scene.phase!="tutorial":
 		scene.begin_play()
 	var binding_count: int = InputMap.action_get_events("jump").size()

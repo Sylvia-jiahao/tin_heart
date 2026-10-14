@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 MCPGameBridge="res://addons/godot_mcp/game_bridge/mcp_game_bridge.gd"
+ChapterMusic="*res://scripts/chapter_music.gd"
 
 [display]
 
@@ -39,6 +40,10 @@ bind_mode=0
 custom_bind_ip=""
 port_override_enabled=false
 port_override=6550
+
+[gui]
+
+theme/custom_font="res://assets/fonts/nani_with_fallback.tres"
 
 [physics]
 

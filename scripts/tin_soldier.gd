@@ -15,6 +15,11 @@ extends CharacterBody2D
 @export var automatic_respawn: bool = true
 @export var coyote_duration: float = 0.12
 @export var jump_buffer_duration: float = 0.14
+@export var air_wind_gain: float = 1.0
+@export var air_wind_drag: float = 0.9
+@export var air_wind_speed_limit: float = 320.0
+var air_control_velocity: float = 0.0
+var air_wind_velocity: float = 0.0
 var coyote_time: float = 0.0
 var jump_buffer: float = 0.0
 var external_wind_enabled: bool = false
@@ -98,7 +103,13 @@ func _physics_process(delta: float) -> void:
 					facing = signf(direction)
 	if not grounded:
 		velocity.y += gravity * delta
-		velocity.x = move_toward(velocity.x, direction * walk_speed, 1400.0 * delta)
+		# Steering must not erase the wind impulse that accumulated on earlier frames.
+		air_control_velocity=move_toward(air_control_velocity,direction*walk_speed,1400.0*delta)
+		var air_force: float=wind if external_wind_enabled else -wind
+		var drag: float=maxf(air_wind_drag,0.001)
+		var decay: float=exp(-drag*delta)
+		air_wind_velocity=clampf(air_wind_velocity*decay+air_force*air_wind_gain*(1.0-decay)/drag,-air_wind_speed_limit,air_wind_speed_limit)
+		velocity.x=air_control_velocity+air_wind_velocity
 	elif braced:
 		velocity.x = 0.0
 		velocity.y = 0.0
@@ -112,12 +123,13 @@ func _physics_process(delta: float) -> void:
 		velocity.x = desired if in_wind else move_toward(velocity.x, desired, 1600.0 * delta)
 		velocity.y = gravity * delta
 	# Wind and slippery slope are environmental motion, independent of animation.
-	if not braced and not external_wind_enabled:
-		velocity.x -= wind * 0.20 if grounded and velocity.y >= 0.0 else wind * delta
+	if grounded and velocity.y>=0.0 and not braced and not external_wind_enabled:
+		velocity.x -= wind * 0.20
 		if grounded and in_wind and velocity.y >= 0.0:
 			velocity.x -= absf(get_floor_normal().x) * 75.0
-	elif not braced and external_wind_enabled and not grounded:
-		velocity.x += wind*delta
+	if grounded:
+		air_wind_velocity=0.0
+		air_control_velocity=velocity.x
 	floor_stop_on_slope = braced or not in_wind
 	move_and_slide()
 	if not grounded and is_on_floor() and big_in_flight:
@@ -142,6 +154,8 @@ func _physics_process(delta: float) -> void:
 func reset_at(at: Vector2) -> void:
 	position = at
 	velocity = Vector2.ZERO
+	air_control_velocity=0.0
+	air_wind_velocity=0.0
 	preparing = false
 	charge_time = 0.0
 	recovery_time = 0.0
@@ -155,6 +169,8 @@ func hold_standing() -> void:
 	# End the playable movement before the meeting shot, including residual landing poses.
 	set_physics_process(false)
 	velocity = Vector2.ZERO
+	air_control_velocity=0.0
+	air_wind_velocity=0.0
 	state = "站立"
 	facing = 1.0
 	preparing = false

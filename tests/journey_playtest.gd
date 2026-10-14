@@ -76,7 +76,9 @@ func verify() -> void:
 	await frames(6)
 	for index in range(30):
 		var success:=false
-		for attempt in range(18):
+		# The last combined room has wind, two pendulums and collapsing paper.
+		# Sample more departure phases now that wind also changes airborne travel.
+		for attempt in range(32 if index==28 else 18):
 			if await traverse(index,attempt):
 				success=true
 				print("PASS_ROUTE ",index+1," attempts=",attempt+1)

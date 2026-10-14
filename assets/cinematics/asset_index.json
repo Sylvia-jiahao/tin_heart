@@ -1,0 +1,47 @@
+{
+  "book_cover": {
+    "region": [
+      22,
+      28,
+      1105,
+      1320
+    ],
+    "transparent": true
+  },
+  "book_spread": {
+    "region": [
+      15,
+      56,
+      1507,
+      910
+    ],
+    "transparent": true
+  },
+  "hand_lift": {
+    "region": [
+      160,
+      2,
+      721,
+      1385
+    ],
+    "transparent": true
+  },
+  "window_landing": {
+    "region": [
+      0,
+      0,
+      1672,
+      941
+    ],
+    "transparent": false
+  },
+  "desk_opening": {
+    "region": [
+      0,
+      0,
+      1672,
+      941
+    ],
+    "transparent": false
+  }
+}

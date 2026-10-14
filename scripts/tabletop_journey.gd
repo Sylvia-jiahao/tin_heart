@@ -5,6 +5,7 @@ const OLD_ART=preload("res://scripts/chapter_art.gd")
 const ROOMS=preload("res://scripts/journey_rooms.gd")
 const SOLDIER=preload("res://scripts/tin_soldier.gd")
 const WIND=preload("res://scripts/wind_effect.gd")
+const STAR_EFFECT=preload("res://scripts/paper_star_effect.gd")
 const DRESS=preload("res://scripts/set_dressing.gd")
 const CUTOUT=preload("res://scripts/cutout_collision.gd")
 const SAVE_PATH="user://tinheart_journey.json"
@@ -31,7 +32,6 @@ var room: Dictionary
 var heading: Label
 var hint: Label
 var footer: Label
-var wind_note: Label
 var ui: CanvasLayer
 var wind_view: Node2D
 var transition: float=0.0
@@ -42,8 +42,18 @@ var dancer_axis: Node2D
 var meeting_time: float=0.0
 var meeting_start:=Vector2.ZERO
 var meeting_zoom:=Vector2.ONE
+var window_cinematic: Node2D
+var meeting_input_ready: bool=false
+var star_pickup_sound: AudioStreamPlayer
 
 func _ready() -> void:
+	if not embedded: ChapterMusic.play_exploration(true)
+	star_pickup_sound=AudioStreamPlayer.new()
+	star_pickup_sound.name="StarPickupSound"
+	star_pickup_sound.stream=load("res://assets/audio/sfx/paper_star_pickup.wav")
+	star_pickup_sound.volume_db=-14.0
+	star_pickup_sound.process_mode=Node.PROCESS_MODE_PAUSABLE
+	add_child(star_pickup_sound)
 	process_mode=Node.PROCESS_MODE_ALWAYS
 	add_to_group("mcp_watch")
 	_setup_inputs()
@@ -95,9 +105,9 @@ func _label(parent: Node, at: Vector2, width: float, size: int) -> Label:
 	label.position=at
 	label.size.x=width
 	label.add_theme_font_size_override("font_size",size)
-	label.add_theme_color_override("font_color",Color("46372d"))
-	label.add_theme_color_override("font_outline_color",Color("efe4cd"))
-	label.add_theme_constant_override("outline_size",3)
+	label.add_theme_color_override("font_color",Color.BLACK)
+	label.add_theme_color_override("font_outline_color",Color.WHITE)
+	label.add_theme_constant_override("outline_size",4)
 	parent.add_child(label)
 	return label
 
@@ -105,10 +115,9 @@ func _ui() -> void:
 	ui=CanvasLayer.new()
 	ui.layer=100
 	add_child(ui)
-	heading=_label(ui,Vector2(45,28),1160,28)
-	hint=_label(ui,Vector2(45,80),1180,21)
-	wind_note=_label(ui,Vector2(900,145),330,20)
-	footer=_label(ui,Vector2(45,752),1180,18)
+	heading=_label(ui,Vector2(45,28),1160,32)
+	hint=_label(ui,Vector2(45,80),1180,24)
+	footer=_label(ui,Vector2(45,752),1180,21)
 	wind_view=WIND.new()
 	ui.add_child(wind_view)
 
@@ -177,13 +186,19 @@ func _build_panel(index: int) -> void:
 		arm.add_child(pin)
 		swings.append({"node":arm,"length":data.length,"period":data.period,"phase":data.phase})
 	if index in [12,27]: gear=_picture("toy_gear",Vector2(58,58),Vector2(700,580),8)
-	star=_picture("paper_star",Vector2(30,30),room.star-Vector2(15,15),12)
+	star=_picture("paper_star",Vector2(36,36),room.star,12)
+	star.set_script(STAR_EFFECT)
+	star.setup()
 	if index!=29: _picture("bookmark_flag",Vector2(44,64),Vector2(1175,room.finish_y-64),5)
 	windmill=_picture("wind_pinwheel",Vector2(72,72),Vector2(1196,171),2)
 	windmill.centered=true
 	windmill.visible=absf(room.wind)>0.0
 	panels.append({"root":room_root,"data":room,"platforms":platforms,"swings":swings,"gear":gear,"star":star,"windmill":windmill,"time":0.0})
-	if index==29: _castle()
+	if index==29:
+		_castle()
+		window_cinematic=load("res://scripts/window_cinematic.gd").new()
+		room_root.add_child(window_cinematic)
+		window_cinematic.setup(player,camera)
 
 func _platform(data: Dictionary,index: int,ordinal: int) -> void:
 	var moving: bool=data.kind=="ruler"
@@ -372,7 +387,6 @@ func _physics_process(delta: float) -> void:
 	var gust: float=pow(maxf(0.0,sin(room_time*TAU/5.5)),2.0)
 	player.external_wind=room.wind*gust if local.x>200 and local.x<1080 else 0.0
 	wind_view.strength=room.wind*gust
-	wind_note.text=("风向右吹" if room.wind>0 else "风向左吹") if gust>0.28 and absf(room.wind)>0 else ""
 	if player.global_position.y>805 or local.x<-35:
 		_retry()
 		return
@@ -429,9 +443,11 @@ func _tick_panel(panel: Dictionary,index: int,delta: float) -> void:
 			return
 	var gust: float=pow(maxf(0.0,sin(panel.time*TAU/5.5)),2.0)
 	panel.windmill.rotation+=delta*gust*7*signf(panel.data.wind)
-	if index==room_index and panel.star.visible and _lower_body_touches_star(panel.data.star,local):
+	panel.star.update_effect(panel.time)
+	if index==room_index and panel.star.visible and _lower_body_touches_star(panel.star.position,local):
 		stars.append(index)
 		panel.star.visible=false
+		star_pickup_sound.play()
 		_save()
 		_footer()
 
@@ -468,6 +484,7 @@ func _skip_room() -> void:
 	_save()
 
 func _enter_meeting() -> void:
+	ChapterMusic.play_dance()
 	finished=true
 	phase="castle_arrival"
 	var base: Dictionary=platforms[room.platforms.size()-1]
@@ -480,13 +497,19 @@ func _enter_meeting() -> void:
 	meeting_start=camera.global_position
 	meeting_zoom=camera.zoom
 	meeting_time=0.0
+	meeting_input_ready=false
 	heading.visible=false
 	footer.visible=false
-	wind_note.text=""
 	hint.text="纸城堡里，\n站着一位纸做的舞蹈家。"
 	_save()
 
 func _meeting_shot(delta: float) -> void:
+	if phase=="window_carry" or phase=="window_end":
+		window_cinematic.update_shot(delta)
+		if window_cinematic.settled:
+			phase="window_end"
+			hint.text="他被放在了窗台上。\n窗外，是另一页故事。"
+		return
 	meeting_time+=delta
 	player.clock+=delta
 	var t:=clampf(meeting_time/3.2,0,1)
@@ -500,6 +523,21 @@ func _meeting_shot(delta: float) -> void:
 	elif dance>=0.90 and dance<1.68: horizontal=-1
 	elif dance>=1.68: horizontal=lerpf(-1,1,(dance-1.68)/0.12)
 	dancer_axis.scale.x=horizontal
+	if meeting_time>=10.0:
+		if phase=="castle_arrival":
+			phase="meeting_ready"
+			player.set_physics_process(true)
+		var actions: Array=["move_left","move_right","jump","brace"]
+		var any_held:=false
+		var new_press:=false
+		for action in actions:
+			any_held=any_held or Input.is_action_pressed(action)
+			new_press=new_press or Input.is_action_just_pressed(action)
+		if not any_held: meeting_input_ready=true
+		if meeting_input_ready and new_press:
+			phase="window_carry"
+			hint.text="一只手伸了过来。"
+			window_cinematic.start()
 
 func _footer() -> void:
 	footer.text="A / D 移动  空格小跳 / 蓄力大跳  Shift 立正  R 重试  Esc 暂停  K 跳过本关（作弊）  ·  纸星 %d / 30" % stars.size()
