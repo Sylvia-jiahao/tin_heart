@@ -1,0 +1,1016 @@
+{
+  "shelf_backdrop": {
+    "region": [
+      0,
+      0,
+      1586,
+      992
+    ],
+    "transparent": false,
+    "source_size": [
+      1586,
+      992
+    ]
+  },
+  "window_backdrop": {
+    "region": [
+      0,
+      0,
+      1586,
+      992
+    ],
+    "transparent": false,
+    "source_size": [
+      1586,
+      992
+    ]
+  },
+  "clock_backdrop": {
+    "region": [
+      0,
+      0,
+      1586,
+      992
+    ],
+    "transparent": false,
+    "source_size": [
+      1586,
+      992
+    ]
+  },
+  "craft_backdrop": {
+    "region": [
+      0,
+      0,
+      1586,
+      992
+    ],
+    "transparent": false,
+    "source_size": [
+      1586,
+      992
+    ]
+  },
+  "wood_ledge": {
+    "region": [
+      11,
+      231,
+      2152,
+      363
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ]
+  },
+  "folded_ledge": {
+    "region": [
+      16,
+      220,
+      2142,
+      409
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ]
+  },
+  "ruler_lift": {
+    "region": [
+      46,
+      180,
+      2085,
+      369
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ]
+  },
+  "pendulum_bob": {
+    "region": [
+      220,
+      13,
+      585,
+      1492
+    ],
+    "transparent": true,
+    "source_size": [
+      1024,
+      1536
+    ]
+  },
+  "wind_pinwheel": {
+    "region": [
+      3,
+      0,
+      1293,
+      1208
+    ],
+    "transparent": true,
+    "source_size": [
+      1300,
+      1209
+    ]
+  },
+  "toy_gear": {
+    "region": [
+      3,
+      3,
+      1249,
+      1246
+    ],
+    "transparent": true,
+    "source_size": [
+      1254,
+      1254
+    ]
+  },
+  "paper_star": {
+    "region": [
+      25,
+      12,
+      1267,
+      1172
+    ],
+    "transparent": true,
+    "source_size": [
+      1313,
+      1198
+    ]
+  },
+  "bookmark_flag": {
+    "region": [
+      1,
+      1,
+      1310,
+      1196
+    ],
+    "transparent": true,
+    "source_size": [
+      1312,
+      1199
+    ]
+  },
+  "block_tower_a": {
+    "region": [
+      237,
+      51,
+      550,
+      1438
+    ],
+    "transparent": true,
+    "source_size": [
+      1024,
+      1536
+    ]
+  },
+  "block_tower_b": {
+    "region": [
+      27,
+      41,
+      1184,
+      1225
+    ],
+    "transparent": true,
+    "source_size": [
+      1230,
+      1278
+    ]
+  },
+  "books_stack_a": {
+    "region": [
+      12,
+      65,
+      1122,
+      1285
+    ],
+    "transparent": true,
+    "source_size": [
+      1145,
+      1374
+    ]
+  },
+  "books_stack_b": {
+    "region": [
+      36,
+      164,
+      1262,
+      984
+    ],
+    "transparent": true,
+    "source_size": [
+      1312,
+      1199
+    ]
+  },
+  "shelf_support": {
+    "region": [
+      189,
+      24,
+      611,
+      1478
+    ],
+    "transparent": true,
+    "source_size": [
+      1024,
+      1536
+    ]
+  },
+  "stool": {
+    "region": [
+      98,
+      48,
+      1337,
+      934
+    ],
+    "transparent": true,
+    "source_size": [
+      1536,
+      1024
+    ]
+  },
+  "folded_bridge": {
+    "region": [
+      30,
+      87,
+      2115,
+      569
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ]
+  },
+  "toy_spool_tower": {
+    "region": [
+      202,
+      38,
+      625,
+      1469
+    ],
+    "transparent": true,
+    "source_size": [
+      1024,
+      1536
+    ]
+  },
+  "ruler_string": {
+    "region": [
+      275,
+      1,
+      451,
+      1528
+    ],
+    "transparent": true,
+    "source_size": [
+      1024,
+      1536
+    ]
+  },
+  "wind_streak": {
+    "region": [
+      70,
+      201,
+      2046,
+      386
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ]
+  },
+  "paper_leaf": {
+    "region": [
+      45,
+      23,
+      1459,
+      985
+    ],
+    "transparent": true,
+    "source_size": [
+      1536,
+      1024
+    ]
+  },
+  "quiet_wall": {
+    "region": [
+      0,
+      0,
+      2172,
+      724
+    ],
+    "transparent": false,
+    "source_size": [
+      2172,
+      724
+    ]
+  },
+  "v3_single_book_1": {
+    "region": [
+      11,
+      215,
+      2149,
+      310
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ]
+  },
+  "v3_single_book_2": {
+    "region": [
+      19,
+      215,
+      2133,
+      293
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ]
+  },
+  "v3_single_book_3": {
+    "region": [
+      28,
+      250,
+      2115,
+      240
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ]
+  },
+  "v3_single_book_4": {
+    "region": [
+      0,
+      250,
+      2169,
+      240
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ]
+  },
+  "v3_blocks_tall_1_flat": {
+    "region": [
+      178,
+      128,
+      641,
+      1442
+    ],
+    "transparent": true,
+    "source_size": [
+      991,
+      1587
+    ]
+  },
+  "v3_blocks_tall_3_flat": {
+    "region": [
+      206,
+      168,
+      732,
+      1177
+    ],
+    "transparent": true,
+    "source_size": [
+      1145,
+      1374
+    ]
+  },
+  "v3_books_low_1": {
+    "region": [
+      13,
+      55,
+      1754,
+      769
+    ],
+    "transparent": true,
+    "source_size": [
+      1774,
+      887
+    ]
+  },
+  "v3_books_low_2": {
+    "region": [
+      27,
+      69,
+      1733,
+      762
+    ],
+    "transparent": true,
+    "source_size": [
+      1774,
+      887
+    ]
+  },
+  "v3_books_low_3": {
+    "region": [
+      20,
+      145,
+      1747,
+      679
+    ],
+    "transparent": true,
+    "source_size": [
+      1774,
+      887
+    ]
+  },
+  "v3_books_low_4": {
+    "region": [
+      13,
+      96,
+      1761,
+      777
+    ],
+    "transparent": true,
+    "source_size": [
+      1774,
+      887
+    ]
+  },
+  "v3_books_mid_1": {
+    "region": [
+      17,
+      39,
+      1335,
+      1084
+    ],
+    "transparent": true,
+    "source_size": [
+      1360,
+      1157
+    ]
+  },
+  "v3_books_mid_2": {
+    "region": [
+      1,
+      33,
+      1359,
+      1104
+    ],
+    "transparent": true,
+    "source_size": [
+      1362,
+      1155
+    ]
+  },
+  "v3_books_mid_3": {
+    "region": [
+      23,
+      82,
+      1343,
+      1028
+    ],
+    "transparent": true,
+    "source_size": [
+      1374,
+      1145
+    ]
+  },
+  "v3_books_mid_4": {
+    "region": [
+      28,
+      81,
+      1315,
+      1041
+    ],
+    "transparent": true,
+    "source_size": [
+      1361,
+      1156
+    ]
+  },
+  "v3_books_tall_1": {
+    "region": [
+      16,
+      107,
+      787,
+      1791
+    ],
+    "transparent": true,
+    "source_size": [
+      812,
+      1937
+    ]
+  },
+  "v3_books_tall_2": {
+    "region": [
+      45,
+      7,
+      1070,
+      1348
+    ],
+    "transparent": true,
+    "source_size": [
+      1145,
+      1374
+    ]
+  },
+  "v3_books_tall_3": {
+    "region": [
+      77,
+      50,
+      995,
+      1273
+    ],
+    "transparent": true,
+    "source_size": [
+      1145,
+      1374
+    ]
+  },
+  "v3_books_tall_4": {
+    "region": [
+      66,
+      23,
+      1033,
+      1327
+    ],
+    "transparent": true,
+    "source_size": [
+      1145,
+      1374
+    ]
+  },
+  "v3_blocks_low_1": {
+    "region": [
+      13,
+      138,
+      1747,
+      665
+    ],
+    "transparent": true,
+    "source_size": [
+      1774,
+      887
+    ]
+  },
+  "v3_blocks_low_2": {
+    "region": [
+      41,
+      117,
+      1698,
+      707
+    ],
+    "transparent": true,
+    "source_size": [
+      1774,
+      887
+    ]
+  },
+  "v3_blocks_low_3": {
+    "region": [
+      6,
+      138,
+      1768,
+      679
+    ],
+    "transparent": true,
+    "source_size": [
+      1774,
+      887
+    ]
+  },
+  "v3_blocks_low_4": {
+    "region": [
+      6,
+      96,
+      1761,
+      714
+    ],
+    "transparent": true,
+    "source_size": [
+      1774,
+      887
+    ]
+  },
+  "v3_blocks_mid_1": {
+    "region": [
+      55,
+      168,
+      1263,
+      835
+    ],
+    "transparent": true,
+    "source_size": [
+      1374,
+      1145
+    ]
+  },
+  "v3_blocks_mid_2": {
+    "region": [
+      23,
+      123,
+      1313,
+      947
+    ],
+    "transparent": true,
+    "source_size": [
+      1360,
+      1157
+    ]
+  },
+  "v3_blocks_mid_3": {
+    "region": [
+      39,
+      141,
+      1300,
+      910
+    ],
+    "transparent": true,
+    "source_size": [
+      1374,
+      1145
+    ]
+  },
+  "v3_blocks_mid_4": {
+    "region": [
+      28,
+      39,
+      1300,
+      1082
+    ],
+    "transparent": true,
+    "source_size": [
+      1362,
+      1155
+    ]
+  },
+  "v3_blocks_tall_1": {
+    "region": [
+      178,
+      29,
+      634,
+      1541
+    ],
+    "transparent": true,
+    "source_size": [
+      991,
+      1587
+    ]
+  },
+  "v3_blocks_tall_2": {
+    "region": [
+      67,
+      117,
+      844,
+      1408
+    ],
+    "transparent": true,
+    "source_size": [
+      979,
+      1606
+    ]
+  },
+  "v3_blocks_tall_3": {
+    "region": [
+      211,
+      0,
+      722,
+      1371
+    ],
+    "transparent": true,
+    "source_size": [
+      1145,
+      1374
+    ]
+  },
+  "v3_blocks_tall_4": {
+    "region": [
+      163,
+      5,
+      642,
+      1611
+    ],
+    "transparent": true,
+    "source_size": [
+      969,
+      1622
+    ]
+  },
+  "v3_furniture_tall_1": {
+    "region": [
+      244,
+      2,
+      694,
+      1369
+    ],
+    "transparent": true,
+    "source_size": [
+      1145,
+      1374
+    ]
+  },
+  "v3_furniture_tall_2": {
+    "region": [
+      211,
+      72,
+      660,
+      1362
+    ],
+    "transparent": true,
+    "source_size": [
+      1060,
+      1484
+    ]
+  },
+  "v3_furniture_mid_1": {
+    "region": [
+      21,
+      52,
+      981,
+      1396
+    ],
+    "transparent": true,
+    "source_size": [
+      1024,
+      1536
+    ]
+  },
+  "v3_furniture_mid_2": {
+    "region": [
+      0,
+      183,
+      1060,
+      1222
+    ],
+    "transparent": true,
+    "source_size": [
+      1060,
+      1484
+    ]
+  },
+  "v3_furniture_low_1": {
+    "region": [
+      0,
+      87,
+      1532,
+      861
+    ],
+    "transparent": true,
+    "source_size": [
+      1536,
+      1024
+    ]
+  },
+  "v3_furniture_low_2": {
+    "region": [
+      13,
+      96,
+      1740,
+      707
+    ],
+    "transparent": true,
+    "source_size": [
+      1774,
+      887
+    ]
+  },
+  "v3_wall_shelf_1": {
+    "region": [
+      0,
+      207,
+      2172,
+      488
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ]
+  },
+  "v3_wall_shelf_2": {
+    "region": [
+      0,
+      190,
+      1942,
+      436
+    ],
+    "transparent": true,
+    "source_size": [
+      1942,
+      809
+    ]
+  },
+  "v3_wall_shelf_3": {
+    "region": [
+      1,
+      236,
+      2006,
+      357
+    ],
+    "transparent": true,
+    "source_size": [
+      2009,
+      783
+    ]
+  },
+  "v3_wall_shelf_wide": {
+    "region": [
+      0,
+      217,
+      2206,
+      329
+    ],
+    "transparent": true,
+    "source_size": [
+      2206,
+      713
+    ]
+  },
+  "v3_paper_bridge_1": {
+    "region": [
+      2,
+      130,
+      2167,
+      505
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ]
+  },
+  "v3_paper_bridge_2": {
+    "region": [
+      0,
+      219,
+      1983,
+      385
+    ],
+    "transparent": true,
+    "source_size": [
+      1983,
+      793
+    ]
+  },
+  "v4_furniture_low_2": {
+    "region": [
+      4,
+      122,
+      1582,
+      784
+    ],
+    "transparent": true,
+    "source_size": [
+      1586,
+      992
+    ]
+  },
+  "v4_cotton_cord": {
+    "region": [
+      477,
+      0,
+      75,
+      1536
+    ],
+    "transparent": true,
+    "source_size": [
+      1024,
+      1536
+    ]
+  },
+  "v4_furniture_mid_2": {
+    "region": [
+      4,
+      135,
+      1528,
+      807
+    ],
+    "transparent": true,
+    "source_size": [
+      1536,
+      1024
+    ]
+  },
+  "v4_furniture_low_1": {
+    "region": [
+      0,
+      203,
+      1586,
+      691
+    ],
+    "transparent": true,
+    "source_size": [
+      1586,
+      992
+    ]
+  },
+  "v4_furniture_tall_1": {
+    "region": [
+      11,
+      96,
+      702,
+      2036
+    ],
+    "transparent": true,
+    "source_size": [
+      725,
+      2169
+    ]
+  },
+  "v4_furniture_tall_2": {
+    "region": [
+      11,
+      130,
+      709,
+      1979
+    ],
+    "transparent": true,
+    "source_size": [
+      724,
+      2172
+    ]
+  },
+  "v4_furniture_mid_1": {
+    "region": [
+      10,
+      29,
+      1574,
+      939
+    ],
+    "transparent": true,
+    "source_size": [
+      1595,
+      986
+    ]
+  },
+  "v4_rope_anchor": {
+    "region": [
+      0,
+      81,
+      1536,
+      813
+    ],
+    "transparent": true,
+    "source_size": [
+      1536,
+      1024
+    ]
+  },
+  "v4_castle_books": {
+    "region": [
+      0,
+      2,
+      2181,
+      716
+    ],
+    "transparent": true,
+    "source_size": [
+      2181,
+      721
+    ]
+  },
+  "v4_cord_knot": {
+    "region": [
+      217,
+      25,
+      856,
+      1200
+    ],
+    "transparent": true,
+    "source_size": [
+      1262,
+      1246
+    ]
+  },
+  "v4_furniture_mid_3": {
+    "region": [
+      87,
+      10,
+      861,
+      1522
+    ],
+    "transparent": true,
+    "source_size": [
+      1024,
+      1536
+    ]
+  },
+  "v4_furniture_mid_4": {
+    "region": [
+      45,
+      85,
+      859,
+      1560
+    ],
+    "transparent": true,
+    "source_size": [
+      930,
+      1691
+    ]
+  }
+}

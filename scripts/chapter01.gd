@@ -3,6 +3,8 @@ extends Node2D
 const ART = preload("res://scripts/chapter_art.gd")
 const SOLDIER = preload("res://scripts/tin_soldier.gd")
 const HAND = preload("res://scripts/child_hand.gd")
+const JOURNEY = preload("res://scripts/tabletop_journey.gd")
+const WIND = preload("res://scripts/wind_effect.gd")
 const INTRO_DURATION: float = 33.0
 const PLACE_INTERVAL: float = 0.75
 var phase: String = "cinematic"
@@ -32,16 +34,31 @@ const MEETING_PUSH_DURATION: float = 3.2
 const MEETING_ZOOM: float = 2.15
 var small_cleared: bool = false
 var big_cleared: bool = false
+@export var journey_enabled: bool = true
+var journey: Node2D
+var ui_root: CanvasLayer
+var tutorial_wind: Node2D
+var brace_taught: bool=false
+var brace_hold: float=0.0
+var brace_gate: StaticBody2D
+var brace_gate_art: Sprite2D
 
 func _ready() -> void:
+	if get_tree().get_meta("tinheart_journey_finished",false):
+		journey_enabled=false
 	add_to_group("mcp_watch")
 	_setup_inputs()
 	RenderingServer.set_default_clear_color(Color("efe4cd"))
+	var overscan=load("res://scripts/journey_art.gd").sprite("quiet_wall",Vector2(5000,2200))
+	overscan.position=Vector2(-1000,-1000)
+	overscan.z_index=-30
+	add_child(overscan)
 	# One panoramic painting keeps the entire room continuous during camera travel.
 	_picture(self,"room_panorama",Vector2(2720,820),Vector2(-80,-120),-10)
-	_picture(self,"desk_surface",Vector2(2720,175),Vector2(-80,475),-5)
-	_picture(self,"desk_apron",Vector2(2720,450),Vector2(-80,650),-4)
-	_picture(self,"tabletop",Vector2(2720,70),Vector2(-80,650),21)
+	var desk_width: float=3460.0 if journey_enabled else 5000.0
+	_picture(self,"desk_surface",Vector2(desk_width,175),Vector2(-1000,475),-5)
+	_picture(self,"desk_apron",Vector2(desk_width,450),Vector2(-1000,650),-4)
+	_picture(self,"tabletop",Vector2(desk_width,70),Vector2(-1000,650),21)
 	_solid(Rect2(0,650,2400,150))
 	_picture(self,"box_back",Vector2(310,205),Vector2(75,445),0)
 	_picture(self,"box_front",Vector2(310,28),Vector2(75,626),14)
@@ -61,7 +78,26 @@ func _ready() -> void:
 	_solid(Rect2(1280,515,180,135))
 	_picture(self,"books_platform",Vector2(700,210),Vector2(1560,440),4)
 	_solid(Rect2(1560,470,700,180))
-	_picture(self,"paper_castle",Vector2(540,345),Vector2(1720,125),5)
+	if journey_enabled:
+		var transition_books=load("res://scripts/journey_art.gd").sprite("books_stack_b",Vector2(200,185))
+		transition_books.position=Vector2(2260,550)
+		transition_books.z_index=4
+		add_child(transition_books)
+		_solid(Rect2(2260,550,200,185))
+		brace_gate=StaticBody2D.new()
+		brace_gate.position=Vector2(2110,400)
+		var gate_shape:=CollisionShape2D.new()
+		var gate_rect:=RectangleShape2D.new()
+		gate_rect.size=Vector2(45,140)
+		gate_shape.shape=gate_rect
+		brace_gate.add_child(gate_shape)
+		add_child(brace_gate)
+		brace_gate_art=load("res://scripts/journey_art.gd").sprite("books_stack_a",Vector2(80,140))
+		brace_gate_art.position=Vector2(2070,330)
+		brace_gate_art.z_index=8
+		add_child(brace_gate_art)
+	var castle := _picture(self,"paper_castle",Vector2(540,345),Vector2(1720,125),5)
+	castle.visible=not journey_enabled
 	_picture(self,"thread_spool",Vector2(60,95),Vector2(40,545),2)
 	_picture(self,"loose_buttons",Vector2(60,42),Vector2(860,575),2)
 	_picture(self,"loose_buttons",Vector2(45,32),Vector2(1500,597),2)
@@ -70,6 +106,7 @@ func _ready() -> void:
 	dancer_axis.position = Vector2(1963,470)
 	dancer_axis.z_index = 15
 	add_child(dancer_axis)
+	dancer_axis.visible=not journey_enabled
 	# Offset the painting so its supporting toe remains at the axis during a flip.
 	dancer_art = _picture(dancer_axis,"paper_dancer",DANCER_SIZE,-DANCER_SUPPORT_POINT,0)
 	hand = HAND.new()
@@ -80,11 +117,29 @@ func _ready() -> void:
 	camera.position = Vector2(640,400)
 	camera.position_smoothing_enabled = false
 	add_child(camera)
+	if journey_enabled:
+		journey=JOURNEY.new()
+		journey.embedded=true
+		journey.player=player
+		journey.camera=camera
+		journey.position=Vector2(2460,0)
+		add_child(journey)
+		player.world_right=45000
 	await get_tree().physics_frame
 	await get_tree().physics_frame
 	player.set_physics_process(false)
 	initialized = true
-	_cinematic()
+	if get_tree().get_meta("tinheart_journey_finished",false):
+		get_tree().remove_meta("tinheart_journey_finished")
+		journey_enabled=false
+		begin_play()
+		player.reset_at(Vector2(1700,468))
+		small_cleared=true
+		big_cleared=true
+		await get_tree().physics_frame
+		await get_tree().physics_frame
+	else:
+		_cinematic()
 
 func _player() -> void:
 	player = SOLDIER.new()
@@ -96,7 +151,7 @@ func _player() -> void:
 	add_child(player)
 
 func _setup_inputs() -> void:
-	var bindings := {"move_left":[KEY_A,KEY_LEFT],"move_right":[KEY_D,KEY_RIGHT],"jump":[KEY_SPACE],"brace":[KEY_SHIFT,KEY_S,KEY_DOWN],"skip_intro":[KEY_ENTER],"replay_chapter":[KEY_R]}
+	var bindings := {"move_left":[KEY_A,KEY_LEFT],"move_right":[KEY_D,KEY_RIGHT],"jump":[KEY_SPACE],"brace":[KEY_SHIFT,KEY_S,KEY_DOWN],"skip_intro":[KEY_ENTER],"replay_chapter":[KEY_R],"continue_journey":[KEY_C]}
 	for action in bindings:
 		if not InputMap.has_action(action):
 			InputMap.add_action(action)
@@ -125,6 +180,7 @@ func _solid(rect: Rect2) -> void:
 
 func HUD() -> void:
 	var ui := CanvasLayer.new()
+	ui_root=ui
 	ui.layer = 100
 	add_child(ui)
 	page = _picture(ui,"storybook_blank",Vector2(1280,800),Vector2.ZERO,0)
@@ -136,8 +192,10 @@ func HUD() -> void:
 	narration.add_theme_constant_override("outline_size",3)
 	narration.add_theme_color_override("font_outline_color",Color("efe4cd"))
 	narration.z_index = 2
-	help = _label(ui,"Enter 跳过演出   ·   R 重播",Vector2(760,28),480,16)
+	help = _label(ui,"Enter 跳过演出   ·   C 继续旅程   ·   K 跳过教学",Vector2(640,28),620,16)
 	help.z_index = 3
+	tutorial_wind=WIND.new()
+	ui.add_child(tutorial_wind)
 
 func _label(parent: Node, text: String, at: Vector2, width: float, size: int) -> Label:
 	var label := Label.new()
@@ -152,6 +210,18 @@ func _label(parent: Node, text: String, at: Vector2, width: float, size: int) ->
 
 func _process(delta: float) -> void:
 	if not initialized:
+		return
+	if phase=="journey":
+		return
+	if Input.is_action_just_pressed("continue_journey"):
+		if is_instance_valid(journey):
+			phase="journey"
+			ui_root.visible=false
+			_prepare_journey_actor()
+			journey.resume()
+		return
+	if journey_enabled and Input.is_action_just_pressed("cheat_skip"):
+		_enter_journey(true)
 		return
 	if Input.is_action_just_pressed("replay_chapter"):
 		get_tree().reload_current_scene()
@@ -271,7 +341,7 @@ func begin_play() -> void:
 	player.z_index = 20
 	player.reset_at(checkpoint)
 	player.set_physics_process(true)
-	help.text = "R 重播开场"
+	help.text = "R 重播开场   ·   C 继续旅程   ·   K 跳过教学" if journey_enabled else "R 重播开场"
 	camera.zoom = Vector2.ONE
 	camera.position = Vector2(checkpoint.x,440)
 
@@ -279,7 +349,7 @@ func _gameplay(delta: float) -> void:
 	if completed:
 		_meeting_shot(delta)
 		return
-	var target := Vector2(clampf(player.position.x,640,1840),440)
+	var target := Vector2(clampf(player.position.x,640,2600 if journey_enabled else 1840),440)
 	camera.position = camera.position.lerp(target,1.0-exp(-delta*4.0))
 	camera.zoom = camera.zoom.lerp(Vector2.ONE,1.0-exp(-delta*2.0))
 	# Advance on landing on the obstacle, rather than after leaving its far edge.
@@ -290,14 +360,37 @@ func _gameplay(delta: float) -> void:
 	narration.position = Vector2(80,165)
 	narration.size.x = 620
 	if big_cleared:
-		narration.text = "再向前，便是纸城堡。\n跳上旧书叠成的平台。"
+		narration.text = "沿着书架，还有一条很长的小路。\n跳上旧书叠成的平台。" if journey_enabled else "再向前，便是纸城堡。\n跳上旧书叠成的平台。"
 	elif small_cleared:
 		narration.text = "前面还有一个高高的木盒。\n按住空格蓄力，松开大跳。"
 	elif player.position.x < 945:
 		narration.text = "小锡兵向前走去。\nA / D 移动"
 	elif not small_cleared:
 		narration.text = "一块小积木挡住了去路。\n短按空格，松开小跳。"
+	if journey_enabled and big_cleared:
+		var in_lesson: bool=player.position.x>1730 and player.position.x<2060 and player.is_on_floor() and player.position.y<490
+		var gust: float=650.0*(0.65+0.35*sin(player.clock*1.5)) if in_lesson and not brace_taught else 0.0
+		player.external_wind_enabled=true
+		player.external_wind=gust
+		tutorial_wind.strength=gust
+		if in_lesson and player.braced and gust>150:
+			brace_hold+=delta
+		if brace_hold>=1.2 and not brace_taught:
+			brace_taught=true
+			brace_gate.get_child(0).set_deferred("disabled",true)
+		if brace_taught:
+			brace_gate_art.position=brace_gate_art.position.lerp(Vector2(2140,550),1.0-exp(-delta*5.0))
+			brace_gate_art.rotation=lerpf(brace_gate_art.rotation,0.35,1.0-exp(-delta*5.0))
+		if player.position.x>1680 and not brace_taught:
+			narration.text="风吹过了书架。\n按住 Shift 立正，稳稳站住片刻。"
+		elif brace_taught:
+			narration.text="他站稳了。\n沿着书架继续向前。"
+		if player.position.x>=2460 and brace_taught:
+			_enter_journey(false)
+			return
 	if not completed and player.position.x > 1660 and player.is_on_floor() and player.position.y < 490 and small_cleared and big_cleared:
+		if journey_enabled:
+			return
 		completed = true
 		phase = "castle_arrival"
 		player.hold_standing()
@@ -305,6 +398,22 @@ func _gameplay(delta: float) -> void:
 		meeting_zoom_start = camera.zoom
 	if completed:
 		_meeting_shot(delta)
+
+func _enter_journey(skip_tutorial: bool) -> void:
+	phase="journey"
+	ui_root.visible=false
+	_prepare_journey_actor()
+	tutorial_wind.strength=0.0
+	player.external_wind=0.0
+	journey.activate()
+	if skip_tutorial:
+		journey._load_room(0)
+	journey._save()
+
+func _prepare_journey_actor() -> void:
+	player.scale=Vector2.ONE
+	player.rotation=0.0
+	player.body_art.rotation=0.0
 
 func _meeting_shot(delta: float) -> void:
 	ending_time += delta

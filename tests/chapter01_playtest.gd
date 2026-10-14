@@ -33,6 +33,7 @@ func jump(scene: Node, hold_frames: int, target_x: float) -> void:
 
 func verify() -> void:
 	var scene = load("res://scenes/chapter01_paper_castle.tscn").instantiate()
+	scene.journey_enabled=false
 	root.add_child(scene)
 	current_scene = scene
 	await frames(6)

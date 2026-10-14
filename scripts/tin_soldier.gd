@@ -12,6 +12,13 @@ extends CharacterBody2D
 @export var world_left: float = 20.0
 @export var world_right: float = 1260.0
 @export var respawn_position: Vector2 = Vector2(140,648)
+@export var automatic_respawn: bool = true
+@export var coyote_duration: float = 0.12
+@export var jump_buffer_duration: float = 0.14
+var coyote_time: float = 0.0
+var jump_buffer: float = 0.0
+var external_wind_enabled: bool = false
+var external_wind: float = 0.0
 
 var state: String = "站立"
 var facing: float = 1.0
@@ -47,6 +54,10 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	clock += delta
 	var grounded := is_on_floor()
+	coyote_time = coyote_duration if grounded else maxf(0.0,coyote_time-delta)
+	jump_buffer = maxf(0.0,jump_buffer-delta)
+	if Input.is_action_just_pressed("jump"):
+		jump_buffer = jump_buffer_duration
 	var direction := Input.get_axis("move_left", "move_right")
 	var locked := recovery_time > landing_recovery - landing_lock
 	last_landing_locked = locked
@@ -54,13 +65,17 @@ func _physics_process(delta: float) -> void:
 	braced = grounded and Input.is_action_pressed("brace") and not locked
 	in_wind = wind_enabled and position.x > 625.0 and position.x < 965.0
 	wind = (310.0 + 190.0 * sin(clock * 1.8)) if in_wind else 0.0
+	if external_wind_enabled:
+		wind = external_wind
+		in_wind = absf(wind)>1.0
 	if direction != 0.0 and not braced and not preparing and not locked:
 		facing = signf(direction)
-	if grounded and not locked and Input.is_action_just_pressed("jump"):
+	if (grounded or coyote_time>0.0) and not locked and jump_buffer>0.0 and not preparing:
 		preparing = true
 		charge_time = 0.0
+		jump_buffer = 0.0
 	if preparing:
-		if not grounded or locked:
+		if (not grounded and coyote_time<=0.0) or locked:
 			preparing = false
 			charge_time = 0.0
 		else:
@@ -76,6 +91,7 @@ func _physics_process(delta: float) -> void:
 					small_jumps += 1
 				preparing = false
 				braced = false
+				coyote_time = 0.0
 				# Direction at release determines launch, including from attention.
 				velocity.x = direction * walk_speed
 				if direction != 0.0:
@@ -91,13 +107,17 @@ func _physics_process(delta: float) -> void:
 		velocity.y = gravity * delta
 	elif velocity.y >= 0.0:
 		var desired := 0.0 if preparing and charge_time >= hold_threshold else direction * walk_speed
+		if external_wind_enabled:
+			desired += wind*0.48
 		velocity.x = desired if in_wind else move_toward(velocity.x, desired, 1600.0 * delta)
 		velocity.y = gravity * delta
 	# Wind and slippery slope are environmental motion, independent of animation.
-	if not braced:
+	if not braced and not external_wind_enabled:
 		velocity.x -= wind * 0.20 if grounded and velocity.y >= 0.0 else wind * delta
 		if grounded and in_wind and velocity.y >= 0.0:
 			velocity.x -= absf(get_floor_normal().x) * 75.0
+	elif not braced and external_wind_enabled and not grounded:
+		velocity.x += wind*delta
 	floor_stop_on_slope = braced or not in_wind
 	move_and_slide()
 	if not grounded and is_on_floor() and big_in_flight:
@@ -115,7 +135,7 @@ func _physics_process(delta: float) -> void:
 		state = "走路"
 	else:
 		state = "站立"
-	if position.y > 850.0 or position.x < world_left or position.x > world_right:
+	if automatic_respawn and (position.y > 850.0 or position.x < world_left or position.x > world_right):
 		reset_at(respawn_position)
 	body_art.queue_redraw()
 
@@ -127,6 +147,9 @@ func reset_at(at: Vector2) -> void:
 	recovery_time = 0.0
 	big_in_flight = false
 	braced = false
+	coyote_time = 0.0
+	jump_buffer = 0.0
+	state = "站立"
 
 func hold_standing() -> void:
 	# End the playable movement before the meeting shot, including residual landing poses.

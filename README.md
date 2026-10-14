@@ -16,7 +16,7 @@
 
 ## 锡兵五动作示范
 
-F5 现在运行第一章开场 CG 与教学，详见 CHAPTER01.md。原动作测试仍可按 F6 运行 `scenes/action_demo.tscn`。
+F5 运行第一章开场 CG、教学、30 房间长关卡，最后抵达纸城堡。长关卡初玩目标约 20 分钟，待真人试玩校准。开场按 C 可继续已保存的房间。详见 CHAPTER01.md 与 design/TABLETOP_JOURNEY.md。原动作测试仍可按 F6 运行 `scenes/action_demo.tscn`。
 
 - A D / 左右箭头：走路。
 - Shift / S / 下箭头：按住立正，站稳抵抗风和坡面滑动，不能移动。
