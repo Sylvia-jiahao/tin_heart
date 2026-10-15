@@ -390,12 +390,16 @@ func _physics_process(delta: float) -> void:
 	if player.global_position.y>805 or local.x<-35:
 		_retry()
 		return
-	var ahead: float=player.global_position.x+100
+	if room_index==29 and local.x>1230 and _standing_on(platforms[room.platforms.size()-1].body):
+		_enter_meeting()
+
+func _process(delta: float) -> void:
+	if not initialized or not active or finished or get_tree().paused: return
+	# Follow the rendered actor each frame, rather than a stepped 60 Hz target.
+	var ahead: float=player.render_global_position().x+100
 	var left_limit: float=640.0 if embedded else global_position.x+640.0
 	var right_limit: float=global_position.x+ROOM_WIDTH*29+1450
 	camera.global_position=camera.global_position.lerp(Vector2(clampf(ahead,left_limit,right_limit),400),1.0-exp(-delta*5.0))
-	if room_index==29 and local.x>1230 and _standing_on(platforms[room.platforms.size()-1].body):
-		_enter_meeting()
 
 func _standing_on(body: PhysicsBody2D) -> bool:
 	if not player.is_on_floor(): return false
@@ -498,13 +502,14 @@ func _enter_meeting() -> void:
 	_save()
 
 func _meeting_shot(delta: float) -> void:
+	if phase=="chapter_bridge": return
 	if phase=="window_carry" or phase=="window_end":
 		window_cinematic.update_shot(delta)
 		if window_cinematic.settled:
 			phase="window_end"
-			hint.text="第二章：雨比世界大\nEnter — 继续"
+			hint.text="第一章 完\nEnter — 翻到下一页"
 			if Input.is_action_just_pressed("skip_intro"):
-				get_tree().change_scene_to_file("res://scenes/chapter02_rain.tscn")
+				_turn_chapter_page()
 		return
 	meeting_time+=delta
 	player.clock+=delta
@@ -534,6 +539,29 @@ func _meeting_shot(delta: float) -> void:
 			phase="window_carry"
 			hint.text="一只手伸了过来。"
 			window_cinematic.start()
+
+func _turn_chapter_page() -> void:
+	phase="chapter_bridge"
+	hint.visible=false
+	get_tree().set_meta("tinheart_window_view",camera.global_position-player.global_position)
+	get_tree().set_meta("tinheart_window_zoom",camera.zoom)
+	if DisplayServer.get_name()!="headless":
+		await RenderingServer.frame_post_draw
+		var snapshot:=ImageTexture.create_from_image(get_viewport().get_texture().get_image())
+		get_tree().set_meta("tinheart_chapter_snapshot",snapshot)
+		# Scene changes detach the old scene before the new chapter finishes _ready().
+		# Keep the outgoing frame on the root so neither the clear color nor new art leaks.
+		var cover:=CanvasLayer.new()
+		cover.name="ChapterSceneCover"
+		cover.layer=109
+		var picture:=TextureRect.new()
+		picture.texture=snapshot
+		picture.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+		picture.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		picture.mouse_filter=Control.MOUSE_FILTER_IGNORE
+		cover.add_child(picture)
+		get_tree().root.add_child(cover)
+	get_tree().change_scene_to_file("res://scenes/chapter02_rain.tscn")
 
 func _footer() -> void:
 	footer.text="A / D 移动  空格小跳 / 蓄力大跳  Shift 立正  R 重试  Esc 暂停  K 跳过本关（作弊）  ·  纸星 %d / 30" % stars.size()

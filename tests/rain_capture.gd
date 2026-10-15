@@ -17,18 +17,19 @@ func capture() -> void:
 	root.add_child(scene)
 	current_scene=scene
 	await frames(8)
+	scene._finish_book()
 	scene.set_process(false)
 	scene.player.set_physics_process(false)
 	scene.phase_time=1.0
 	scene._storm(0)
 	await photo("01_window")
 	scene.phase_time=5.5
-	scene.player.position=Vector2(900,508)
+	scene.player.position=Vector2(300,508)
 	scene._storm(0)
 	await photo("02_storm")
 	scene.phase="fall"
-	scene.fall_start=Vector2(1080,510)
-	scene.fall_camera=Vector2(960,360)
+	scene.fall_start=Vector2(scene.WINDOW_EDGE+22,510)
+	scene.fall_camera=Vector2(410,358)
 	scene.warm_window.visible=true
 	scene.warm_window.position=Vector2(640,80)
 	scene.phase_time=3.5

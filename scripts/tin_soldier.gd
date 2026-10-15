@@ -43,8 +43,12 @@ var small_jumps: int = 0
 var big_jumps: int = 0
 var last_landing_locked: bool = false
 var body_art: Node2D
+var previous_motion_position:=Vector2.ZERO
+var current_motion_position:=Vector2.ZERO
 
 func _ready() -> void:
+	previous_motion_position=position
+	current_motion_position=position
 	name = "TinSoldier"
 	add_to_group("mcp_watch")
 	floor_snap_length = 8.0
@@ -60,6 +64,7 @@ func _ready() -> void:
 	add_child(body_art)
 
 func _physics_process(delta: float) -> void:
+	previous_motion_position=position
 	clock += delta
 	var grounded := is_on_floor()
 	coyote_time = coyote_duration if grounded else maxf(0.0,coyote_time-delta)
@@ -138,6 +143,7 @@ func _physics_process(delta: float) -> void:
 		air_control_velocity=velocity.x
 	floor_stop_on_slope = braced or not in_wind
 	move_and_slide()
+	current_motion_position=position
 	if not grounded and is_on_floor() and big_in_flight:
 		recovery_time = landing_recovery
 		big_in_flight = false
@@ -159,6 +165,10 @@ func _physics_process(delta: float) -> void:
 
 func reset_at(at: Vector2) -> void:
 	position = at
+	previous_motion_position=at
+	current_motion_position=at
+	if is_instance_valid(body_art): body_art.position=Vector2.ZERO
+	if is_instance_valid(body_art): body_art.clear_cinematic_pose()
 	velocity = Vector2.ZERO
 	air_control_velocity=0.0
 	air_wind_velocity=0.0
@@ -195,9 +205,23 @@ func hold_standing() -> void:
 	in_wind = false
 	clear_environment()
 	body_art.rotation = 0.0
+	body_art.clear_cinematic_pose()
+	body_art.position = Vector2.ZERO
+	previous_motion_position=position
+	current_motion_position=position
 	body_art.walk_phase = 0.0
 	body_art.salute_weight = 0.0
 	body_art._process(0.0)
+
+func render_position() -> Vector2:
+	# Interpolate only the drawing. Collision/input remain on the existing 60 Hz clock.
+	# External cinematic placement and checkpoint teleports must never leave a trail.
+	if not is_physics_processing() or not position.is_equal_approx(current_motion_position): return position
+	return previous_motion_position.lerp(current_motion_position,clampf(Engine.get_physics_interpolation_fraction(),0.0,1.0))
+
+func render_global_position() -> Vector2:
+	var parent_2d:=get_parent() as Node2D
+	return parent_2d.to_global(render_position()) if parent_2d!=null else render_position()
 
 func _mcp_state() -> Dictionary:
 	return {"action": state, "grounded": is_on_floor(), "braced": braced, "preparing": preparing, "charge": snappedf(charge_time, 0.01), "recovery": snappedf(recovery_time, 0.01), "last_jump": last_jump, "small_jumps": small_jumps, "big_jumps": big_jumps, "wind": snappedf(wind, 0.1), "landing_locked": last_landing_locked}

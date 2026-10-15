@@ -388,7 +388,7 @@ func _gameplay(delta: float) -> void:
 	if completed:
 		_meeting_shot(delta)
 		return
-	var target := Vector2(clampf(player.position.x,640,2600 if journey_enabled else 1840),440)
+	var target := Vector2(clampf(player.render_position().x,640,2600 if journey_enabled else 1840),440)
 	camera.position = camera.position.lerp(target,1.0-exp(-delta*4.0))
 	camera.zoom = camera.zoom.lerp(Vector2.ONE,1.0-exp(-delta*2.0))
 	# Advance on landing on the obstacle, rather than after leaving its far edge.

@@ -28,14 +28,14 @@ func verify() -> void:
 	var missing: Array=[]
 	for name in assets:
 		if not ResourceLoader.exists("res://assets/chapter02/%s.png" % name): missing.append(name)
-	check(assets.size()==57 and missing.is_empty(),"all 57 original generated assets and revisions are indexed and imported")
+	check(assets.size()==61 and missing.is_empty(),"all 61 original generated assets and revisions are indexed and imported")
 	var identity: int=scene.player.get_instance_id()
 	for mode in ["idle","brace","left","jump","mixed"]:
 		release()
 		scene.phase="window"
 		scene.phase_time=0
 		scene.window_root.visible=true
-		scene.player.reset_at(Vector2(690,508))
+		scene.player.reset_at(scene.WINDOW_FOOT)
 		scene.player.set_physics_process(true)
 		for i in range(1800):
 			if mode=="brace": Input.action_press("brace")

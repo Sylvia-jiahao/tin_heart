@@ -853,5 +853,65 @@
     ],
     "generator": "builtin image_gen",
     "sha256": "bbe657252fde0d231ce09891de5e4a63acbffcdf223584613f290a734cff06a2"
+  },
+  "window_rooftops_v1": {
+    "region": [
+      0,
+      0,
+      1536,
+      1024
+    ],
+    "transparent": false,
+    "source_size": [
+      1536,
+      1024
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "d2f3d59abf790b8d14536a9582125d8e2995d4df932040c79662a5bc5ee98813"
+  },
+  "storybook_place_v3": {
+    "region": [
+      0,
+      0,
+      1536,
+      1024
+    ],
+    "transparent": false,
+    "source_size": [
+      1536,
+      1024
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "7cbdc48d20a5ff5e2e25200493e5956aa402d2d6cb41fc7ae190c50b9d4892a0"
+  },
+  "storybook_place_v4": {
+    "region": [
+      0,
+      0,
+      1536,
+      1024
+    ],
+    "transparent": false,
+    "source_size": [
+      1536,
+      1024
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "dd587f6fbcc34685d789742f7e3156ff2c222e0c0b9402f7064971d5ba8cd263"
+  },
+  "boat_forearm_grip": {
+    "region": [
+      37,
+      195,
+      1709,
+      526
+    ],
+    "transparent": true,
+    "source_size": [
+      1774,
+      887
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "984fe6406c28a0b2e58520fcad1a7447fb26c5a6c9b14ba6fec4d8716cd47bad"
   }
 }

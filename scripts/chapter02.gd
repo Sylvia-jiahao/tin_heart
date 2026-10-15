@@ -7,12 +7,20 @@ const CUTOUT=preload("res://scripts/cutout_collision.gd")
 const WIND=preload("res://scripts/wind_effect.gd")
 const JOURNEY_ART=preload("res://scripts/journey_art.gd")
 const STAR_EFFECT=preload("res://scripts/paper_star_effect.gd")
+const CINEMATIC_ART=preload("res://scripts/cinematic_art.gd")
+const WINDOW_FOOT:=Vector2(0,508)
+const WINDOW_EDGE: float=590.0
 const WIDTH: float=1280.0
 const COUNT: int=36
 const ROAD_ORIGIN:=Vector2(3000,0)
 @export var save_path: String="user://tinheart_rain.json"
 @export var start_on_street: bool=false
-var phase: String="window"
+var phase: String="book"
+var chapter_book: CanvasLayer
+var window_view:=Vector2(0,-150)
+var window_zoom:=Vector2.ONE*1.4
+var window_backdrop: Sprite2D
+var window_pane: Sprite2D
 var player: CharacterBody2D
 var camera: Camera2D
 var ui: CanvasLayer
@@ -64,6 +72,8 @@ var paper_audio: AudioStreamPlayer
 var storm_scraps: Array[Sprite2D]=[]
 var paper_folded: bool=false
 var arrival_last_beat: int=0
+var arrival_origin:=Vector2.ZERO
+var boat_front: Sprite2D
 var last_failure: Dictionary={}
 
 func _ready() -> void:
@@ -88,17 +98,70 @@ func _ready() -> void:
 	_audio()
 	await get_tree().physics_frame
 	await get_tree().physics_frame
-	player.reset_at(Vector2(690,508))
+	player.reset_at(WINDOW_FOOT)
+	window_view=get_tree().get_meta("tinheart_window_view",Vector2(0,-150))
+	window_zoom=get_tree().get_meta("tinheart_window_zoom",Vector2.ONE*1.4)
+	for key in ["tinheart_window_view","tinheart_window_zoom"]:
+		if get_tree().has_meta(key): get_tree().remove_meta(key)
+	camera.position=WINDOW_FOOT+window_view
+	camera.zoom=window_zoom
+	camera.reset_smoothing()
 	player.set_physics_process(true)
 	initialized=true
 	var resume: bool=get_tree().get_meta("tinheart_resume_rain",false)
 	if resume:
 		get_tree().remove_meta("tinheart_resume_rain")
-		_load()
+		await _load()
+		if phase=="book" and not is_instance_valid(chapter_book): await _begin_book()
 	elif start_on_street:
 		_enter_street(0)
 	else:
-		_music("rain")
+		await _begin_book()
+
+func _begin_book() -> void:
+	if is_instance_valid(chapter_book): chapter_book.free()
+	phase="book"
+	phase_time=0
+	player.reset_at(WINDOW_FOOT)
+	player.hold_standing()
+	camera.position=WINDOW_FOOT+window_view
+	camera.zoom=window_zoom
+	camera.reset_smoothing()
+	window_root.visible=true
+	paper.position=Vector2(-135,495)
+	paper_folded=false
+	var paper_source:=ART.sprite("sliding_paper",270,15)
+	paper.texture=paper_source.texture
+	paper.scale=paper_source.scale
+	paper_source.free()
+	_storm(0)
+	ui.visible=false
+	for particle in rain: particle.visible=false
+	wind_audio.volume_db=-60
+	rain_audio.volume_db=-60
+	var snapshot: Texture2D=null
+	if get_tree().has_meta("tinheart_chapter_snapshot"): snapshot=get_tree().get_meta("tinheart_chapter_snapshot")
+	if get_tree().has_meta("tinheart_chapter_snapshot"): get_tree().remove_meta("tinheart_chapter_snapshot")
+	if snapshot==null and DisplayServer.get_name()!="headless":
+		await RenderingServer.frame_post_draw
+		snapshot=ImageTexture.create_from_image(get_viewport().get_texture().get_image())
+	chapter_book=load("res://scripts/chapter_page_turn.gd").new()
+	chapter_book.snapshot=snapshot
+	add_child(chapter_book)
+	_release_scene_cover()
+	ChapterMusic.play_opening()
+
+func _release_scene_cover() -> void:
+	var cover:=get_tree().root.get_node_or_null("ChapterSceneCover")
+	if cover!=null: cover.queue_free()
+
+func _finish_book() -> void:
+	if is_instance_valid(chapter_book): chapter_book.queue_free()
+	phase="window"
+	phase_time=0
+	ui.visible=true
+	player.set_physics_process(true)
+	_music("rain")
 
 func _inputs() -> void:
 	var bindings={"move_left":[KEY_A,KEY_LEFT],"move_right":[KEY_D,KEY_RIGHT],"jump":[KEY_SPACE],"brace":[KEY_SHIFT,KEY_S,KEY_DOWN],"retry_room":[KEY_R],"pause_journey":[KEY_ESCAPE],"cheat_skip":[KEY_K],"rain_continue":[KEY_C],"skip_intro":[KEY_ENTER]}
@@ -151,6 +214,10 @@ func _ui() -> void:
 	pause_label=_label(Vector2(450,310),500,38)
 	pause_label.text="歇一会儿。\nEsc — 继续"
 	pause_label.visible=false
+	var pause_overlay:=CanvasLayer.new()
+	pause_overlay.layer=120
+	add_child(pause_overlay)
+	pause_label.reparent(pause_overlay,false)
 	wind_view=WIND.new()
 	wind_view.process_mode=Node.PROCESS_MODE_PAUSABLE
 	ui.add_child(wind_view)
@@ -189,28 +256,38 @@ func _rect(parent: Node,rect: Rect2) -> StaticBody2D:
 func _window() -> void:
 	window_root=Node2D.new()
 	add_child(window_root)
-	# Separate sash and curtains reveal an empty opening instead of a second closed window.
-	var backdrop:=_picture(window_root,"sill_room",Vector2(-80,-130),1440,850,-4)
-	var window_texture: AtlasTexture=backdrop.texture
-	window_texture.region.size.y*=0.60
-	backdrop.scale.y=640.0/window_texture.region.size.y
+	# Exact first-chapter painting and scale, translated relative to its standing foot.
+	# The sash is cut from that same original: at rest these pieces reconstruct it.
+	var origin:=Vector2(-690,-10)
+	window_backdrop=CINEMATIC_ART.sprite("window_landing",Vector2(1280,720))
+	window_backdrop.position=origin
+	window_backdrop.z_index=-5
+	window_root.add_child(window_backdrop)
 	var edge_material:=ShaderMaterial.new()
-	edge_material.shader=load("res://assets/chapter02/background_edges.gdshader")
-	backdrop.material=edge_material
-	_rect(window_root,Rect2(-80,510,1140,400))
-	_picture(window_root,"sill_ledge",Vector2(-80,510),1140,190,0)
-	_rect(window_root,Rect2(-80,-500,80,1010))
-	paper=_picture(window_root,"sliding_paper",Vector2(440,495),430,22,1)
+	edge_material.shader=load("res://assets/cinematics/window_edges.gdshader")
+	window_backdrop.material=edge_material
+	_rect(window_root,Rect2(-690,510,1280,400))
+	_rect(window_root,Rect2(-285,-500,50,1010))
+	# Exterior only becomes visible as the original sash rises, like a real sash window.
+	var opening:=_picture(window_root,"window_rooftops_v1",origin+Vector2(428,0),762,475,-4)
+	opening.visible=false
+	opening.name="ExteriorOpening"
 	sash=Node2D.new()
-	sash.position=Vector2(370,-45)
+	sash.position=origin+Vector2(428,0)
 	window_root.add_child(sash)
-	_picture(sash,"window_sash",Vector2.ZERO,350,550,-2)
+	var pane=CINEMATIC_ART.sprite("window_landing",Vector2(1280,720))
+	var texture: AtlasTexture=pane.texture.duplicate()
+	texture.region=Rect2(1672.0*428/1280,0,1672.0*762/1280,941.0*475/720)
+	pane.texture=texture
+	pane.z_index=-3
+	sash.add_child(pane)
+	window_pane=pane
 	sash_right=Node2D.new()
-	sash_right.position=Vector2(1070,-45)
 	window_root.add_child(sash_right)
-	_picture(sash_right,"window_sash",Vector2(-350,0),350,550,-2).flip_h=true
-	_picture(window_root,"curtain_left",Vector2(-45,-90),210,600,2)
-	curtain=_picture(window_root,"curtain_right",Vector2(1030,-110),250,600,2)
+	curtain=_picture(window_root,"curtain_right",Vector2(500,-10),180,475,2)
+	curtain.modulate.a=0
+	paper=_picture(window_root,"sliding_paper",Vector2(-135,495),270,15,1)
+	paper.modulate.a=0
 	for i in range(5):
 		storm_scraps.append(_picture(window_root,"paper_scrap",Vector2.ZERO,20+i*4,0,5))
 	warm_window=_picture(self,"warm_window",Vector2(500,-400),260,280,-3)
@@ -404,6 +481,11 @@ func _process(delta: float) -> void:
 	clock+=delta
 	phase_time+=delta
 	if phase=="street": elapsed+=delta
+	if phase=="book":
+		if is_instance_valid(chapter_book): chapter_book.update_shot(phase_time)
+		if Input.is_action_just_pressed("rain_continue"): _load()
+		elif phase_time>=11.0 or (phase_time>0.5 and Input.is_action_just_pressed("skip_intro")): _finish_book()
+		return
 	_rain_step(delta)
 	if phase=="window": _storm(delta)
 	elif phase=="fall": _fall(delta)
@@ -428,12 +510,21 @@ func _storm(delta: float) -> void:
 	footer.text="A / D 移动  空格跳跃  Shift 立正  ·  Enter 跳过开场  C 继续旅程"
 	hint.text="窗外的风，忽然变大了。" if phase_time>2 else "屋里的旋律，还没有散去。"
 	var strength: float=smoothstep(2.0,5.0,phase_time)
-	sash.scale.x=lerpf(1.0,0.08,strength)
-	sash_right.scale.x=sash.scale.x
+	window_root.get_node("ExteriorOpening").visible=strength>0
+	window_root.get_node("ExteriorOpening").modulate=Color.WHITE.lerp(Color("8293b2"),strength*0.65)
+	# Raise the original sash behind the lintel; crop hidden pixels rather than squash it.
+	var travel: float=475*strength
+	var pane_texture: AtlasTexture=window_pane.texture
+	pane_texture.region.position.y=travel*941.0/720
+	pane_texture.region.size.y=maxf(0.5,(475-travel)*941.0/720)
+	window_pane.visible=strength<0.999
+	curtain.modulate.a=strength
+	paper.modulate.a=smoothstep(0.3,1.5,phase_time)
+	for particle in rain: particle.visible=strength>0.6
 	curtain.rotation=-0.35*strength+sin(clock*8)*0.045*strength
 	paper.position.x+=strength*delta*115
 	paper.rotation=-0.05*strength
-	if strength>0.95 and paper.position.x>930 and not paper_folded:
+	if strength>0.95 and paper.position.x>370 and not paper_folded:
 		var lifted:=ART.sprite("folded_paper",220)
 		paper.texture=lifted.texture
 		paper.scale=lifted.scale
@@ -443,20 +534,23 @@ func _storm(delta: float) -> void:
 		storm_scraps[i].position=Vector2(fposmod(clock*(100+i*15)+i*230,1450)-100,200+sin(clock*2+i)*90)
 		storm_scraps[i].rotation=clock*strength+i
 		storm_scraps[i].visible=strength>0.15
+		storm_scraps[i].position.x-=690
 	player.environment_drift=700.0*strength
 	player.brace_drift_ratio=0.2
 	player.air_wind_speed_limit=800.0
 	player.external_wind=1600.0*strength if not player.is_on_floor() else 0.0
 	wind_view.strength=600.0*strength
 	wind_audio.volume_db=lerpf(-40,-15,strength)
-	camera.position=camera.position.lerp(Vector2(clampf(player.position.x,640,960),360),1-exp(-delta*2))
-	if player.position.x>1072 and player.position.y>500:
+	rain_audio.volume_db=lerpf(-55,-27,strength)
+	camera.position=camera.position.lerp(Vector2(clampf(player.render_position().x,0,410),WINDOW_FOOT.y+window_view.y),1-exp(-delta*2))
+	camera.zoom=camera.zoom.lerp(Vector2.ONE*1.25,1-exp(-delta*0.35))
+	if player.position.x>WINDOW_EDGE+12 and player.position.y>500:
 		fall_start=player.position
 		fall_camera=camera.position
 		phase="fall"
 		phase_time=0.0
 		player.hold_standing()
-		warm_window.position=Vector2(640,80)
+		warm_window.position=Vector2(camera.position.x-95,80)
 		warm_window.visible=true
 		_save()
 
@@ -473,22 +567,30 @@ func _fall(_delta: float) -> void:
 	warm_window.visible=t>0.6
 	warm_window.modulate.a=smoothstep(0.6,2.0,t)
 	if phase_time>=5.5:
-		_enter_street(0,false)
-		phase="arrival"
-		phase_time=0
-		player.hold_standing()
-		camera.zoom=Vector2.ONE*2.4
-		arrival_drop=_picture(self,"falling_drop",player.position+Vector2(100,-400),60,105,25)
-		arrival_splash=_picture(self,"splash",player.position+Vector2(45,-30),160,60,25)
-		arrival_last_beat=0
-		if splash_audio.stream: splash_audio.play()
+		_begin_arrival()
+
+func _begin_arrival() -> void:
+	_enter_street(0,false)
+	phase="arrival"
+	phase_time=0
+	player.hold_standing()
+	arrival_origin=player.position
+	player.body_art.play_cinematic_pose("rise",0)
+	camera.zoom=Vector2.ONE*2.2
+	camera.position=arrival_origin+Vector2(30,-65)
+	arrival_drop=_picture(self,"falling_drop",arrival_origin+Vector2(125,-400),60,105,25)
+	arrival_splash=_picture(self,"splash",arrival_origin+Vector2(90,-30),160,60,25)
+	arrival_last_beat=0
+	if splash_audio.stream: splash_audio.play()
 
 func _arrival(_delta: float) -> void:
 	heading.text="雨中的独腿人"
-	hint.text="一滴、两滴。\n原来，这只是普通的雨。"
-	var t: float=smoothstep(0.8,4.0,phase_time)
-	camera.zoom=Vector2.ONE*lerpf(2.4,1.0,t)
-	camera.position=player.position+Vector2(lerpf(0,360,t),-180)
+	footer.text="Enter — 跳过演出"
+	hint.text="他躺了一会儿。" if phase_time<0.9 else ("然后，用手撑住湿冷的石板。" if phase_time<4.2 else "一滴、两滴。\n原来，这只是普通的雨。")
+	player.body_art.play_cinematic_pose("rise",phase_time)
+	var t: float=smoothstep(3.8,6.3,phase_time)
+	camera.zoom=Vector2.ONE*lerpf(2.2,1.0,t)
+	camera.position=arrival_origin+Vector2(lerpf(30,360,t),lerpf(-65,-180,t))
 	if is_instance_valid(arrival_drop):
 		var count: int=int(phase_time/1.3)
 		if count>arrival_last_beat and count<3:
@@ -498,18 +600,28 @@ func _arrival(_delta: float) -> void:
 		arrival_drop.visible=phase_time<3.9 and beat<0.65
 		arrival_drop.position.y=player.position.y-420+380*clampf(beat/0.65,0,1)
 		arrival_splash.visible=phase_time<3.9 and beat>=0.65 and beat<1.0
-	if phase_time>4.5:
+	if phase_time>6.5:
 		phase="street"
 		phase_time=0
+		player.body_art.clear_cinematic_pose()
+		player.body_art._process(0)
 		player.set_physics_process(true)
 		if is_instance_valid(arrival_drop): arrival_drop.queue_free()
 		if is_instance_valid(arrival_splash): arrival_splash.queue_free()
 		_save()
 
 func _enter_street(index: int,persist: bool=true) -> void:
+	_release_scene_cover()
+	if is_instance_valid(arrival_drop): arrival_drop.queue_free()
+	if is_instance_valid(arrival_splash): arrival_splash.queue_free()
+	arrival_drop=null
+	arrival_splash=null
 	phase="street"
 	phase_time=0.0
 	active_room=clampi(index,0,35)
+	if is_instance_valid(chapter_book): chapter_book.queue_free()
+	ui.visible=true
+	for particle in rain: particle.visible=true
 	window_root.visible=false
 	window_root.modulate=Color.WHITE
 	warm_window.visible=false
@@ -565,7 +677,7 @@ func _street(delta: float) -> void:
 			if hit.get_normal().y< -0.5 and hit.get_collider().get_meta("wet",false): player.wet_surface_slide=340.0
 	for i in range(maxi(0,active_room-1),mini(COUNT,active_room+2)): _mechanisms(panels[i],delta)
 	_update_stars()
-	var target:=Vector2(clampf(player.position.x,ROAD_ORIGIN.x+640,ROAD_ORIGIN.x+COUNT*WIDTH-640),440)
+	var target:=Vector2(clampf(player.render_position().x,ROAD_ORIGIN.x+640,ROAD_ORIGIN.x+COUNT*WIDTH-640),440)
 	if data.kind=="melody" and local.x>350 and local.x<1000 and player.braced:
 		melody_hold+=delta
 		if melody_hold>=2:
@@ -695,7 +807,18 @@ func _begin_boat() -> void:
 	ending_start=player.position
 	if paper_audio.stream: paper_audio.play()
 	ending_hand=_picture(self,"hand_pinch_vertical",player.position+Vector2(-78,-1100),190,0,30)
-	boat=_picture(self,"newspaper_boat",player.position+Vector2(100,100),270,120,22)
+	boat=_picture(self,"newspaper_boat",player.position+Vector2(100,100),270,100,18)
+	boat_front=Sprite2D.new()
+	boat_front.texture=boat.texture
+	boat_front.centered=false
+	boat_front.z_as_relative=false
+	boat_front.z_index=22
+	var front_material:=ShaderMaterial.new()
+	front_material.shader=load("res://assets/chapter02/boat_front.gdshader")
+	var atlas: AtlasTexture=boat.texture
+	front_material.set_shader_parameter("atlas_region",Vector4(atlas.region.position.x/atlas.atlas.get_width(),atlas.region.position.y/atlas.atlas.get_height(),atlas.region.size.x/atlas.atlas.get_width(),atlas.region.size.y/atlas.atlas.get_height()))
+	boat_front.material=front_material
+	boat.add_child(boat_front)
 	boat.visible=false
 	story=_picture(ui,"storybook_find_v2",Vector2.ZERO,get_viewport_rect().size.x,get_viewport_rect().size.y,-1)
 	story.visible=false
@@ -722,7 +845,7 @@ func _boat(_delta: float) -> void:
 		ending_hand.visible=false
 		player.visible=false
 		story.visible=true
-		var asset: String="storybook_find_v2" if phase_time<6 else ("storybook_fold_v2" if phase_time<9 else "storybook_place_v2")
+		var asset: String="storybook_find_v2" if phase_time<6 else ("storybook_fold_v2" if phase_time<9 else "storybook_place_v4")
 		if story.name!=asset:
 			var new_image:=ART.sprite(asset,get_viewport_rect().size.x,get_viewport_rect().size.y)
 			story.texture=new_image.texture
@@ -741,7 +864,8 @@ func _boat(_delta: float) -> void:
 		player.z_index=20
 		var t: float=phase_time-12
 		boat.position=ending_start+Vector2(80+t*75,30+sin(t*1.8)*5)
-		player.position=boat.position+Vector2(130,95)
+		player.position=boat.position+Vector2(130,112)
+		player.body_art.play_cinematic_pose("boat_hold")
 		camera.position=ending_start+Vector2(150+t*40,-100)
 		camera.zoom=Vector2.ONE
 		hint.position=Vector2(65,90)
@@ -755,7 +879,7 @@ func _boat(_delta: float) -> void:
 func _save() -> void:
 	var file:=FileAccess.open(save_path,FileAccess.WRITE)
 	if file:
-		file.store_string(JSON.stringify({"chapter":2,"room":active_room,"seconds":elapsed,"deaths":deaths,"skipped":skipped,"stars":stars,"finished":finished,"phase":"boat" if phase=="boat" else ("window" if phase=="window" or phase=="fall" else "street")}))
+		file.store_string(JSON.stringify({"chapter":2,"room":active_room,"seconds":elapsed,"deaths":deaths,"skipped":skipped,"stars":stars,"finished":finished,"phase":"boat" if phase=="boat" else ("window" if phase in ["book","window","fall"] else "street")}))
 
 func _load() -> void:
 	if not FileAccess.file_exists(save_path): return
@@ -772,7 +896,9 @@ func _load() -> void:
 		var number: int=int(saved_room)
 		if number>=0 and number<COUNT and not skipped.has(number): skipped.append(number)
 	var saved_phase: String=data.get("phase","window")
-	if saved_phase=="window": return
+	if saved_phase=="window":
+		await _begin_book()
+		return
 	_enter_street(int(data.get("room",0)),false)
 	if saved_phase=="boat" or bool(data.get("finished",false)): _begin_boat()
 

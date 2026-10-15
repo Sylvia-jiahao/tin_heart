@@ -20,6 +20,10 @@ var musket: Node2D
 var cutout_material: ShaderMaterial
 var border_material: ShaderMaterial
 var pickup_pieces: Array[Sprite2D]=[]
+var cinematic_pose: String=""
+var cinematic_time: float=0.0
+var boat_left_grip: Sprite2D
+var boat_right_grip: Sprite2D
 
 const REGIONS := {
 	"torso": Rect2(50,105,934,1348), "head": Rect2(131,10,797,1471),
@@ -48,9 +52,9 @@ func _ready() -> void:
 	torso = _joint(facing_root,"BodyPivot",Vector2(0,-49))
 	left_arm = _joint(torso,"BackShoulder",Vector2(-16,-35))
 	left_arm.z_index = 3
-	_piece(left_arm,"upper_arm",Vector2(11,22),Vector2(-5.5,-3))
+	_piece(left_arm,"upper_arm",Vector2(11,22),Vector2(-5.5,-3),true)
 	left_forearm = _joint(left_arm,"BackElbow",Vector2(0,16))
-	_piece(left_forearm,"forearm",Vector2(8,27),Vector2(-4,-3))
+	_piece(left_forearm,"forearm",Vector2(8,27),Vector2(-4,-3),true)
 	_piece(torso,"torso",Vector2(38,51),Vector2(-19,-46))
 	head = _joint(torso,"Neck",Vector2(0,-44))
 	_piece(head,"head",Vector2(27,49),Vector2(-13.5,-45))
@@ -70,7 +74,7 @@ func _joint(parent: Node, joint_name: String, at: Vector2) -> Node2D:
 	parent.add_child(joint)
 	return joint
 
-func _piece(parent: Node2D, asset: String, dimensions: Vector2, at: Vector2) -> Sprite2D:
+func _piece(parent: Node2D, asset: String, dimensions: Vector2, at: Vector2, mirrored: bool=false) -> Sprite2D:
 	var atlas := AtlasTexture.new()
 	atlas.atlas = load("res://assets/soldier/%s.png" % asset)
 	atlas.region = REGIONS[asset]
@@ -80,6 +84,7 @@ func _piece(parent: Node2D, asset: String, dimensions: Vector2, at: Vector2) -> 
 	backing.name = asset.to_pascal_case()+"WhiteRim"
 	backing.texture = atlas
 	backing.centered = false
+	backing.flip_h = mirrored
 	backing.position = at-Vector2.ONE
 	backing.scale = (dimensions+Vector2(2,2))/atlas.region.size
 	backing.material = border_material
@@ -88,6 +93,7 @@ func _piece(parent: Node2D, asset: String, dimensions: Vector2, at: Vector2) -> 
 	sprite.name = asset.to_pascal_case()+"Paper"
 	sprite.texture = atlas
 	sprite.centered = false
+	sprite.flip_h = mirrored
 	sprite.position = at
 	sprite.scale = dimensions/atlas.region.size
 	sprite.material = cutout_material
@@ -115,7 +121,13 @@ func _pin(parent: Node2D) -> void:
 func _process(delta: float) -> void:
 	if not is_instance_valid(actor):
 		return
+	if cinematic_pose!="":
+		_cinematic_pose()
+		return
 	var s = actor
+	# Apply once to the actual character, not the detached action-demo paper preview.
+	if get_parent()==actor:
+		position=s.render_position()-s.position
 	var lean: float = sin(s.clock*2.0)*0.02
 	var crouch := 0.0
 	var back_shoulder := 0.04
@@ -210,3 +222,134 @@ func _process(delta: float) -> void:
 	boot.rotation = hip_angle-knee_angle
 	# Counter-rotate at the grip so the long barrel stays beside the face.
 	musket.rotation = -torso.rotation-right_arm.rotation-right_forearm.rotation+gun_tilt
+
+func clear_cinematic_pose() -> void:
+	cinematic_pose=""
+	if not is_instance_valid(facing_root): return
+	facing_root.rotation=0
+	facing_root.position=Vector2.ZERO
+	thigh.visible=true
+	left_arm.z_as_relative=true
+	left_arm.z_index=3
+	right_arm.z_as_relative=true
+	right_arm.z_index=0
+	musket.z_as_relative=true
+	musket.z_index=0
+	musket.position=Vector2(4,17)
+	if is_instance_valid(boat_left_grip):
+		boat_left_grip.visible=false
+		boat_right_grip.visible=false
+	for forearm in [left_forearm,right_forearm]:
+		forearm.get_node("ForearmPaper").visible=true
+		forearm.get_node("ForearmWhiteRim").visible=true
+		forearm.get_node("BrassPin").z_index=0
+		forearm.get_node("BrassPin").position=Vector2(-2.5,-2.5)
+
+func _boat_grips() -> void:
+	if not is_instance_valid(boat_left_grip):
+		var rain_art=load("res://scripts/rain_art.gd")
+		boat_left_grip=rain_art.sprite("boat_forearm_grip",25,13)
+		boat_left_grip.position=Vector2(-2,-3)
+		boat_left_grip.z_index=1
+		var sleeve_tone:=ShaderMaterial.new()
+		sleeve_tone.shader=load("res://assets/chapter02/boat_sleeve_tone.gdshader")
+		boat_left_grip.material=sleeve_tone
+		left_forearm.add_child(boat_left_grip)
+		boat_right_grip=rain_art.sprite("boat_forearm_grip",25,13)
+		boat_right_grip.flip_h=true
+		boat_right_grip.position=Vector2(-23,-5)
+		boat_right_grip.z_index=1
+		boat_right_grip.material=sleeve_tone
+		right_forearm.add_child(boat_right_grip)
+	boat_left_grip.visible=true
+	boat_right_grip.visible=true
+	for forearm in [left_forearm,right_forearm]:
+		forearm.get_node("ForearmPaper").visible=false
+		forearm.get_node("ForearmWhiteRim").visible=false
+		forearm.get_node("BrassPin").z_index=2
+	left_forearm.get_node("BrassPin").position=Vector2(-2.5,-0.5)
+
+func play_cinematic_pose(pose: String,time: float=0.0) -> void:
+	cinematic_pose=pose
+	cinematic_time=time
+	_cinematic_pose()
+
+func _reach(upper: Node2D,lower: Node2D,target: Vector2,bend: float,first: float=16.0,second: float=22.0) -> void:
+	var offset: Vector2=target-upper.position
+	var distance: float=clampf(offset.length(),absf(first-second)+0.1,first+second-0.01)
+	var angle: float=acos(clampf((first*first+distance*distance-second*second)/(2*first*distance),-1,1))
+	upper.rotation=offset.angle()-PI/2-bend*angle
+	lower.rotation=bend*(PI-acos(clampf((first*first+second*second-distance*distance)/(2*first*second),-1,1)))
+
+func _cinematic_pose() -> void:
+	position=Vector2.ZERO
+	musket.position=Vector2(4,17)
+	facing_root.scale=Vector2.ONE
+	facing_root.position=Vector2.ZERO
+	facing_root.rotation=0
+	torso.position=Vector2(0,-49)
+	torso.rotation=0
+	head.rotation=0
+	thigh.position=Vector2(0,-49)
+	thigh.rotation=0
+	shin.rotation=0
+	boot.rotation=0
+	left_arm.rotation=0
+	right_arm.rotation=0
+	left_forearm.rotation=0
+	right_forearm.rotation=0
+	if cinematic_pose=="boat_hold":
+		thigh.visible=false
+		_boat_grips()
+		# Lower the chest against the near fold; elbows open and forearms wrap inward.
+		torso.position.y=-30
+		torso.rotation=0.12
+		head.rotation=-0.08
+		left_arm.rotation=0.65
+		right_arm.rotation=-0.65
+		left_forearm.rotation=0.20-torso.rotation-left_arm.rotation
+		right_forearm.rotation=-torso.rotation-right_arm.rotation
+		# Coat and gun stay inside the hull; the gripping arms cross the near rim.
+		left_arm.z_as_relative=false
+		right_arm.z_as_relative=false
+		left_arm.z_index=24
+		right_arm.z_index=24
+		musket.z_as_relative=false
+		musket.z_index=21
+	else:
+		var rise: float=smoothstep(0.8,4.2,cinematic_time)
+		var fold: float=sin(rise*PI)
+		var tilt: float=(PI/2)*(1-rise)
+		# Lower the hip into a crouch before straightening. A planted boot and palm
+		# support the body; this must not read as a rigid toy levitating upright.
+		var hip:=Vector2(-6*(1-rise),-lerpf(19,49,rise)+20*fold)
+		facing_root.rotation=tilt
+		facing_root.position=hip-Vector2(0,-49).rotated(tilt)
+		torso.rotation=0.60*fold
+		head.rotation=-0.15*fold
+		var plant: float=smoothstep(0.0,0.6,rise)
+		var ankle:=Vector2(lerpf(-48,0,plant),lerpf(-19,-7,plant))
+		var leg_target: Vector2=facing_root.to_local(to_global(ankle))
+		_reach(thigh,shin,leg_target,1,20,22)
+		boot.rotation=lerpf(PI/2,0,plant)-tilt-thigh.rotation-shin.rotation
+		right_arm.rotation=0.3*fold
+		right_forearm.rotation=-0.75*fold
+		var support: float=1-smoothstep(2.7,4.0,cinematic_time)
+		var target: Vector2=torso.to_local(to_global(Vector2(30,-1)))
+		_reach(left_arm,left_forearm,target,1)
+		left_arm.rotation=lerp_angle(0,left_arm.rotation,support)
+		left_forearm.rotation=lerp_angle(0,left_forearm.rotation,support)
+		if cinematic_time>4.2:
+			torso.rotation=sin((cinematic_time-4.2)*TAU*1.8)*0.045*(1-smoothstep(4.2,4.8,cinematic_time))
+	musket.rotation=-torso.rotation-right_arm.rotation-right_forearm.rotation-0.04
+	if cinematic_pose=="boat_hold":
+		# Both hands grip the paper; the musket rests separately inside the boat.
+		musket.global_position=to_global(Vector2(46,-63))
+		musket.global_rotation=global_rotation-0.14
+	if cinematic_pose=="rise" and cinematic_time<4.2:
+		# Leave the gun on the stone while pushing up, then lift it back to its grip.
+		var pickup: float=smoothstep(2.8,4.2,cinematic_time)
+		var grip: Vector2=musket.global_position
+		var upright: float=musket.global_rotation
+		musket.global_position=to_global(Vector2(-20,-7)).lerp(grip,pickup)
+		musket.global_rotation=lerp_angle(global_rotation+PI/2,upright,pickup)
