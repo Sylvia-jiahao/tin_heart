@@ -39,10 +39,23 @@ func verify() -> void:
 		if i>4 and scene.player.is_on_floor(): perched=true
 	check(not perched and scene.player.position.y>body.position.y+lower.position.y+100,"protruding lower book cover cannot become a side foothold")
 	var feet:=Vector2(300,600)
-	check(not scene._lower_body_touches_star(feet+Vector2(0,-100),feet),"head contact cannot collect a star")
-	check(not scene._lower_body_touches_star(feet+Vector2(0,-75),feet),"upper torso cannot collect a star")
-	check(scene._lower_body_touches_star(feet+Vector2(0,-35),feet),"lower body can collect a star")
-	check(scene._lower_body_touches_star(feet+Vector2(0,-5),feet),"supporting foot can collect a star")
-	check(not scene._lower_body_touches_star(feet+Vector2(35,-35),feet),"distant star is not collected by a wide radius")
+	scene.player.reset_at(feet)
+	scene.player.set_physics_process(false)
+	scene.player.clock=0
+	var art: Node2D=scene.player.body_art
+	art._process(0)
+	check(not art.touches_star(feet+Vector2(0,-118)),"head-only contact cannot collect a star")
+	check(art.touches_star(feet+Vector2(0,-75)),"upper torso can now collect a star")
+	check(art.touches_star(feet+Vector2(28,-65)),"arm contact can collect a star")
+	check(art.touches_star(feet+Vector2(0,-35)),"lower body can collect a star")
+	check(art.touches_star(feet+Vector2(0,-5)),"supporting foot can collect a star")
+	check(not art.touches_star(feet+Vector2(50,-35)),"distant star is not collected by a wide radius")
+	scene.player.facing=-1
+	art._process(0)
+	check(art.touches_star(feet+Vector2(-28,-65)),"mirrored arm contact can collect a star")
+	scene.player.braced=true
+	art._process(0.2)
+	var hand: Sprite2D=art.left_forearm.get_node("ForearmPaper")
+	check(art.touches_star(hand.to_global(hand.get_rect().get_center())),"raised saluting forearm can collect a star")
 	print("LEDGE_STAR_RESULT ",failures)
 	quit(0 if failures.is_empty() else 1)

@@ -19,6 +19,7 @@ var right_forearm: Node2D
 var musket: Node2D
 var cutout_material: ShaderMaterial
 var border_material: ShaderMaterial
+var pickup_pieces: Array[Sprite2D]=[]
 
 const REGIONS := {
 	"torso": Rect2(50,105,934,1348), "head": Rect2(131,10,797,1471),
@@ -91,7 +92,18 @@ func _piece(parent: Node2D, asset: String, dimensions: Vector2, at: Vector2) -> 
 	sprite.scale = dimensions/atlas.region.size
 	sprite.material = cutout_material
 	parent.add_child(sprite)
+	if asset!="head" and asset!="musket": pickup_pieces.append(sprite)
 	return sprite
+
+func touches_star(at: Vector2) -> bool:
+	# Use the animated paper body and limbs, including mirrored or raised arms.
+	# Head/hat and equipment do not extend the pickup region.
+	var star:=PackedVector2Array([at+Vector2(-12,-12),at+Vector2(12,-12),at+Vector2(12,12),at+Vector2(-12,12)])
+	for piece in pickup_pieces:
+		var rect:=piece.get_rect()
+		var body:=PackedVector2Array([piece.to_global(rect.position),piece.to_global(Vector2(rect.end.x,rect.position.y)),piece.to_global(rect.end),piece.to_global(Vector2(rect.position.x,rect.end.y))])
+		if not Geometry2D.intersect_polygons(body,star).is_empty(): return true
+	return false
 
 func _pin(parent: Node2D) -> void:
 	var art = load("res://scripts/chapter_art.gd")

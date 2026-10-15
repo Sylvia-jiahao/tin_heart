@@ -1,0 +1,63 @@
+{
+  "tracks": [
+    {
+      "file": "rain_nocturne.wav",
+      "seconds": 48.0,
+      "peak": 0.1899341493844986,
+      "rms": 0.04281456768512726,
+      "loop_begin_frame": 0,
+      "loop_end_frame": 2116800,
+      "sample_rate": 44100,
+      "loop_period_seconds": 48.0
+    }
+  ],
+  "sounds": [
+    {
+      "file": "rain_nocturne.wav",
+      "seconds": 48.0,
+      "peak": 0.1899341493844986,
+      "rms": 0.04281456768512726,
+      "loop_begin_frame": 0,
+      "loop_end_frame": 2116800,
+      "sample_rate": 44100,
+      "loop_period_seconds": 48.0
+    },
+    {
+      "file": "rain.wav",
+      "seconds": 8.0,
+      "peak": 0.25577759742736816,
+      "rms": 0.05500001832842827
+    },
+    {
+      "file": "wind.wav",
+      "seconds": 8.0,
+      "peak": 0.4086778163909912,
+      "rms": 0.08000947535037994
+    },
+    {
+      "file": "splash.wav",
+      "seconds": 0.65,
+      "peak": 0.13698242798327673,
+      "rms": 0.014429810120537364
+    },
+    {
+      "file": "step.wav",
+      "seconds": 0.14,
+      "peak": 0.13982134268603913,
+      "rms": 0.0235917550497462
+    },
+    {
+      "file": "paper.wav",
+      "seconds": 0.5,
+      "peak": 0.10304681665760261,
+      "rms": 0.01144876661111236
+    },
+    {
+      "file": "memory.wav",
+      "seconds": 7.0,
+      "peak": 0.28847208619117737,
+      "rms": 0.07485143095254898
+    }
+  ],
+  "source": "Original additive synthesis and seeded noise; no external samples."
+}

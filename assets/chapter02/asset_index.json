@@ -1,0 +1,857 @@
+{
+  "sill_room": {
+    "region": [
+      0,
+      0,
+      2172,
+      724
+    ],
+    "transparent": false,
+    "source_size": [
+      2172,
+      724
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "ddf141732f363150c7f49ccf8650df2539ba8f7e4814cc45fd21e610046d4ee2"
+  },
+  "night_wall": {
+    "region": [
+      0,
+      0,
+      2172,
+      724
+    ],
+    "transparent": false,
+    "source_size": [
+      2172,
+      724
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "9f439451edc5c71736907fa34a5e19e5accd9834c75eeeaf176e13847f4e0244"
+  },
+  "street_panorama": {
+    "region": [
+      0,
+      0,
+      2172,
+      724
+    ],
+    "transparent": false,
+    "source_size": [
+      2172,
+      724
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "67fb1f131b1876578255b219fa3683754d5bc7253488d7f721d3da222add918a"
+  },
+  "gutter_panorama": {
+    "region": [
+      0,
+      0,
+      2172,
+      724
+    ],
+    "transparent": false,
+    "source_size": [
+      2172,
+      724
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "7255986660dac4505d938db3df06d5df0894b7c09f7129f9f8ce364420a3d4ec"
+  },
+  "porch_panorama": {
+    "region": [
+      0,
+      0,
+      2167,
+      726
+    ],
+    "transparent": false,
+    "source_size": [
+      2167,
+      726
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "7b5270089f73ce8bd6abeb3573cec26c2fcc2bfd9517afa392b5a91a509fac63"
+  },
+  "drift_panorama": {
+    "region": [
+      0,
+      0,
+      2172,
+      724
+    ],
+    "transparent": false,
+    "source_size": [
+      2172,
+      724
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "2df634d5816156c6830b7504b599c479ae40c43009c77e6b0a59bdcd8e92f88e"
+  },
+  "window_sash": {
+    "region": [
+      150,
+      39,
+      1004,
+      1157
+    ],
+    "transparent": true,
+    "source_size": [
+      1278,
+      1230
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "eb864c4e8011bbca8915a86c0ea279061a7edf31bd375befb79d713dae141bdc"
+  },
+  "curtain_left": {
+    "region": [
+      43,
+      17,
+      938,
+      1499
+    ],
+    "transparent": true,
+    "source_size": [
+      1024,
+      1536
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "90f4afe3334b1098d53ed914f8d7ce0614007b5e2b5f9c500848e3fc4ff7ebf2"
+  },
+  "curtain_right": {
+    "region": [
+      13,
+      18,
+      999,
+      1498
+    ],
+    "transparent": true,
+    "source_size": [
+      1024,
+      1536
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "2a10969e49dd50cf43ab465c160ffa03c3f58f6a1368a929f823c187a348db96"
+  },
+  "sliding_paper": {
+    "region": [
+      13,
+      117,
+      2144,
+      492
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "197bf86db2d0a0950acd9a4d7e6882661d8c4d7ec2baaaf445ecc1a18c11f326"
+  },
+  "folded_paper": {
+    "region": [
+      21,
+      5,
+      1492,
+      993
+    ],
+    "transparent": true,
+    "source_size": [
+      1536,
+      1024
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "77f2b9e98979c1c129e1c808c0c08d550eb7471de6f156620b423699137664f0"
+  },
+  "warm_window": {
+    "region": [
+      27,
+      16,
+      1233,
+      1190
+    ],
+    "transparent": true,
+    "source_size": [
+      1285,
+      1224
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "e6db0718aa5d32bd54b8f12447790f257984d33456569b8f8592237443942ea6"
+  },
+  "stone_flat_a": {
+    "region": [
+      36,
+      165,
+      2104,
+      445
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "ef78de6da1755d6f52f8d73b9ba6b48674651777f93179251908d5451e7022d4"
+  },
+  "stone_flat_b": {
+    "region": [
+      20,
+      214,
+      2143,
+      413
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "7f79dcc39e1142dd0cd0efe936e12df9d95c9ee71589184c187978c26d8f0e89"
+  },
+  "stone_step": {
+    "region": [
+      25,
+      179,
+      1724,
+      584
+    ],
+    "transparent": true,
+    "source_size": [
+      1774,
+      887
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "ce11e5196a27e534dff829c08f64814b8952a1286ad9cd525f6ace7654ee6308"
+  },
+  "stone_tall": {
+    "region": [
+      5,
+      171,
+      1476,
+      788
+    ],
+    "transparent": true,
+    "source_size": [
+      1484,
+      1060
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "6405124bda782531af966e6a74af5f2adbe2f462b22d91896f917eb4225bae3e"
+  },
+  "cobbles": {
+    "region": [
+      29,
+      141,
+      1717,
+      595
+    ],
+    "transparent": true,
+    "source_size": [
+      1774,
+      887
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "89fa24898537c22672b8947245ffa2048135bcc929bd48ed83a01f1e5fb34f07"
+  },
+  "curb": {
+    "region": [
+      7,
+      280,
+      1971,
+      362
+    ],
+    "transparent": true,
+    "source_size": [
+      1983,
+      793
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "504c0282f4c947c03feb6adf17ba23008f67886d78efee6bc131a5897271c31c"
+  },
+  "plank_oak": {
+    "region": [
+      8,
+      250,
+      2159,
+      268
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "ec0f1e1031644bdebc2ac4fc19036e596c26e1521851736b1a4dd2a358af9854"
+  },
+  "plank_pine": {
+    "region": [
+      18,
+      175,
+      2137,
+      380
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "e6839bddcb1c4e08d0dfd8a4b605979b12c26074ce3411bb7fe045b079a1e13b"
+  },
+  "plank_join": {
+    "region": [
+      11,
+      164,
+      1959,
+      544
+    ],
+    "transparent": true,
+    "source_size": [
+      1983,
+      793
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "794da416748ed54c52bd23ead3a41f89a5596699304dee10e34c652daf52ed67"
+  },
+  "wood_wedge": {
+    "region": [
+      48,
+      99,
+      1457,
+      847
+    ],
+    "transparent": true,
+    "source_size": [
+      1536,
+      1024
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "2dc6b445deee34c951b6b3fa0575eb9df19988b284deaeb35241584be5f431bd"
+  },
+  "crate": {
+    "region": [
+      19,
+      115,
+      1500,
+      790
+    ],
+    "transparent": true,
+    "source_size": [
+      1536,
+      1024
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "345a88f8d8c637d8a9e0f9e0c41f887860d58ed74b4496e226c4313238bc48d8"
+  },
+  "drain": {
+    "region": [
+      34,
+      214,
+      1706,
+      477
+    ],
+    "transparent": true,
+    "source_size": [
+      1774,
+      887
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "25b7f96f6089106a92cd3e9e3563f66b3d2763e650bc1a7e8212ed6492a7c421"
+  },
+  "bank": {
+    "region": [
+      0,
+      179,
+      2172,
+      471
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "503c90cc6154797bb25f55d9deb003860822002a2f0b26ee9bc00b27b69f4fe3"
+  },
+  "floating_lid": {
+    "region": [
+      13,
+      123,
+      2150,
+      474
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "39630cfaf9a4477ac9be009723e7b5e3e2529c69609ed41991bea72aea91e834"
+  },
+  "cork": {
+    "region": [
+      39,
+      107,
+      2093,
+      521
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "4f9ef3906d2b3f33a329f23b4979d3903b7cb6380e9720848352413517d8dbed"
+  },
+  "hanging_sign": {
+    "region": [
+      25,
+      150,
+      1500,
+      751
+    ],
+    "transparent": true,
+    "source_size": [
+      1536,
+      1024
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "d16e15878e651886de5cc2bb3f51928655c603e81dc4486dcd50fc0a9ec90441"
+  },
+  "rope": {
+    "region": [
+      450,
+      10,
+      124,
+      1517
+    ],
+    "transparent": true,
+    "source_size": [
+      1024,
+      1536
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "2efd7b7592da42aeb0efde9f67565f64ce13446015276f8d7b3323d42018475e"
+  },
+  "sill_ledge": {
+    "region": [
+      7,
+      249,
+      2159,
+      256
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "d7841ec33ed9d0ba3d39f17cc5b21b75f542d853d9a5a05ee0e5f0f159ef90aa"
+  },
+  "awning": {
+    "region": [
+      30,
+      49,
+      1497,
+      833
+    ],
+    "transparent": true,
+    "source_size": [
+      1536,
+      1024
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "73ef65110b5b679fd411c73511e72de1d94a935a12197b8b8acb41946e3b539b"
+  },
+  "porch_roof": {
+    "region": [
+      115,
+      2,
+      1370,
+      1019
+    ],
+    "transparent": true,
+    "source_size": [
+      1536,
+      1024
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "4140214e219a55ec159c99ff66ba12b95a8eec152b5ba230fb2761f4425bdf71"
+  },
+  "boots": {
+    "region": [
+      181,
+      14,
+      1223,
+      976
+    ],
+    "transparent": true,
+    "source_size": [
+      1536,
+      1024
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "3f9d4128024d3f7282c2c2a793d004f3ca3a24f65d17da0b35f435b787171cda"
+  },
+  "hand_pinch": {
+    "region": [
+      122,
+      0,
+      1106,
+      1209
+    ],
+    "transparent": true,
+    "source_size": [
+      1228,
+      1281
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "b7e6668bd3c1c02c2173e9a7a09d09e47363cc24b9ff4415ed4a7184d3f95022"
+  },
+  "newspaper_boat": {
+    "region": [
+      7,
+      125,
+      1754,
+      673
+    ],
+    "transparent": true,
+    "source_size": [
+      1774,
+      887
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "86d86de6f06ae718068e465b8a2948693b90726798e633a33109ca7f81a17269"
+  },
+  "newspaper": {
+    "region": [
+      19,
+      21,
+      1735,
+      834
+    ],
+    "transparent": true,
+    "source_size": [
+      1774,
+      887
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "365a9235780be6eb0092cc4ab96484fa478973caa46037fd12178ac7644d3c64"
+  },
+  "rain_streak": {
+    "region": [
+      444,
+      45,
+      728,
+      940
+    ],
+    "transparent": true,
+    "source_size": [
+      1536,
+      1024
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "5096c3bd8c3de9b800a2928606bea3c62055ee7e5dad2dc5aa4e153012cf8ac5"
+  },
+  "hand_pinch_vertical": {
+    "region": [
+      238,
+      0,
+      541,
+      1489
+    ],
+    "transparent": true,
+    "source_size": [
+      1024,
+      1536
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "14f3e5313e0337e73353e765b47f704e2eb6a7e3aaf3270a8f9d5f5bd3de811b"
+  },
+  "gathered_drop": {
+    "region": [
+      130,
+      70,
+      769,
+      1406
+    ],
+    "transparent": true,
+    "source_size": [
+      1024,
+      1536
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "dace81f896e1fd4b5564fa076950b380e8b2b6c20ced50cc1d8c71177268c5a5"
+  },
+  "falling_drop": {
+    "region": [
+      117,
+      0,
+      790,
+      1536
+    ],
+    "transparent": true,
+    "source_size": [
+      1024,
+      1536
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "3e479c1783ab43a240bff716edc846474d46844caa4da999831fb248c18dcf0d"
+  },
+  "splash": {
+    "region": [
+      60,
+      95,
+      1699,
+      721
+    ],
+    "transparent": true,
+    "source_size": [
+      1774,
+      887
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "2bba2dd4d78859b5a02e47d98dea5571afa7aac4a10cfc35863c09a79fca3802"
+  },
+  "ripple": {
+    "region": [
+      55,
+      263,
+      1668,
+      438
+    ],
+    "transparent": true,
+    "source_size": [
+      1774,
+      887
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "c094337e72cfaa4789a550f4d5d0af8072d0f95097eac511a0372fa00f8f578c"
+  },
+  "water_flow": {
+    "region": [
+      0,
+      0,
+      2163,
+      727
+    ],
+    "transparent": false,
+    "source_size": [
+      2163,
+      727
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "776fc077a871f849924860ea5e4e37b54a8426e126fb143ef2b99dd60c6f2ded"
+  },
+  "paper_scrap": {
+    "region": [
+      278,
+      131,
+      1029,
+      746
+    ],
+    "transparent": true,
+    "source_size": [
+      1536,
+      1024
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "f37d58fe93dde956b787d084868ec38bdd9348b3c05d7d0bb62a06200225b7d5"
+  },
+  "storybook_find": {
+    "region": [
+      0,
+      0,
+      1536,
+      1024
+    ],
+    "transparent": false,
+    "source_size": [
+      1536,
+      1024
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "2bdf0c71ae067ef465244025aefde9eeb61f6d9c4b5f303697bde946dfb63477"
+  },
+  "storybook_fold": {
+    "region": [
+      0,
+      0,
+      1536,
+      1024
+    ],
+    "transparent": false,
+    "source_size": [
+      1536,
+      1024
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "eba2db6c69b6ba483a405f7c971542228bb9f36480262141ba1875e97c79f6ce"
+  },
+  "storybook_place": {
+    "region": [
+      0,
+      0,
+      1536,
+      1024
+    ],
+    "transparent": false,
+    "source_size": [
+      1536,
+      1024
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "c3ba686b6cdde9dad8c09f2a4e5e0b1a3b5572e941a6646e046d45b6bdf524c6"
+  },
+  "storybook_find_v2": {
+    "region": [
+      0,
+      0,
+      1536,
+      1024
+    ],
+    "transparent": false,
+    "source_size": [
+      1536,
+      1024
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "90d2006e448339b59044a26fc54c94d8b2dcc3a79941a87f53385a189f7d25de"
+  },
+  "storybook_fold_v2": {
+    "region": [
+      0,
+      0,
+      1536,
+      1024
+    ],
+    "transparent": false,
+    "source_size": [
+      1536,
+      1024
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "5fa17fe6a91db644973f171a6bd37d658006dc0a8415ecc26b7be5009def2366"
+  },
+  "storybook_place_v2": {
+    "region": [
+      0,
+      0,
+      1536,
+      1024
+    ],
+    "transparent": false,
+    "source_size": [
+      1536,
+      1024
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "c4f58a29d5fba58d738dbebd4cc2bc2c6ba7160bf0873dde2619d7ef0279f9f7"
+  },
+  "pavement_v2": {
+    "region": [
+      4,
+      127,
+      2165,
+      483
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "6c42104f3f9c851df8dc33600ae1b48427f08641ecd527888ee4bd5e4941857d"
+  },
+  "pier_v2": {
+    "region": [
+      13,
+      113,
+      1296,
+      986
+    ],
+    "transparent": true,
+    "source_size": [
+      1320,
+      1192
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "e39baf269b24c9a1843e2d6f28538146ac92f8839d1f00006457d3f45a0009ee"
+  },
+  "trestle_v2": {
+    "region": [
+      59,
+      66,
+      1137,
+      1126
+    ],
+    "transparent": true,
+    "source_size": [
+      1254,
+      1254
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "1b1423fcdaa0fe7c40ec6b540021fe38fb118f5e5e157e7943654c2b0235a021"
+  },
+  "wave_crest_v2": {
+    "region": [
+      7,
+      135,
+      2157,
+      565
+    ],
+    "transparent": true,
+    "source_size": [
+      2172,
+      724
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "a8435354ab399dd9163de2429eb4d683c86be473b01f09ba912ca341031b06fe"
+  },
+  "broken_quay_v3": {
+    "region": [
+      0,
+      60,
+      1747,
+      797
+    ],
+    "transparent": true,
+    "source_size": [
+      1774,
+      887
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "c73b8c311c40262d6e372b4faf24061107e7bbe8e8e5c008ec19ad130565e8ee"
+  },
+  "quay_rock_v3": {
+    "region": [
+      22,
+      27,
+      1280,
+      1150
+    ],
+    "transparent": true,
+    "source_size": [
+      1312,
+      1199
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "66898160b6a9a373b3a3491f30f46e9bfaa8a9e76908bcde42075ed758771182"
+  },
+  "rain_thread_v3": {
+    "region": [
+      594,
+      103,
+      33,
+      1095
+    ],
+    "transparent": true,
+    "source_size": [
+      1218,
+      1292
+    ],
+    "generator": "builtin image_gen",
+    "sha256": "bbe657252fde0d231ce09891de5e4a63acbffcdf223584613f290a734cff06a2"
+  }
+}

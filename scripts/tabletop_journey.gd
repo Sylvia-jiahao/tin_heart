@@ -444,18 +444,12 @@ func _tick_panel(panel: Dictionary,index: int,delta: float) -> void:
 	var gust: float=pow(maxf(0.0,sin(panel.time*TAU/5.5)),2.0)
 	panel.windmill.rotation+=delta*gust*7*signf(panel.data.wind)
 	panel.star.update_effect(panel.time)
-	if index==room_index and panel.star.visible and _lower_body_touches_star(panel.star.position,local):
+	if index==room_index and panel.star.visible and player.body_art.touches_star(panel.star.global_position):
 		stars.append(index)
 		panel.star.visible=false
 		star_pickup_sound.play()
 		_save()
 		_footer()
-
-func _lower_body_touches_star(at: Vector2,feet: Vector2) -> bool:
-	# Match only the lower half of the physical soldier, including the supporting foot.
-	var lower_body:=Rect2(feet+Vector2(-12.5,-51.5),Vector2(25,51.5))
-	var star_box:=Rect2(at-Vector2(12,12),Vector2(24,24))
-	return lower_body.intersects(star_box)
 
 func _hits(at: Vector2,radius: float) -> bool:
 	var box:=Rect2(player.global_position+Vector2(-10,-120),Vector2(20,120))
@@ -508,7 +502,9 @@ func _meeting_shot(delta: float) -> void:
 		window_cinematic.update_shot(delta)
 		if window_cinematic.settled:
 			phase="window_end"
-			hint.text="他被放在了窗台上。\n窗外，是另一页故事。"
+			hint.text="第二章：雨比世界大\nEnter — 继续"
+			if Input.is_action_just_pressed("skip_intro"):
+				get_tree().change_scene_to_file("res://scenes/chapter02_rain.tscn")
 		return
 	meeting_time+=delta
 	player.clock+=delta

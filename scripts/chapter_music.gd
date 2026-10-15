@@ -3,7 +3,8 @@ extends Node
 const TRACKS={
 	"opening":"res://assets/audio/chapter01/storybook_prelude.wav",
 	"exploration":"res://assets/audio/chapter01/paper_castle_walk.wav",
-	"dance":"res://assets/audio/chapter01/paper_dancer_waltz.wav"
+	"dance":"res://assets/audio/chapter01/paper_dancer_waltz.wav",
+	"rain":"res://assets/audio/chapter02/rain_nocturne.wav"
 }
 @export var exploration_volume_db: float=-12.0
 @export var opening_volume_db: float=-14.0
@@ -18,6 +19,9 @@ func _ready() -> void:
 	var manifest: Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://assets/audio/chapter01/score.json"))
 	var loop_points: Dictionary={}
 	for entry in manifest.tracks: loop_points[entry.file]=entry
+	if FileAccess.file_exists("res://assets/audio/chapter02/score.json"):
+		var rain_score: Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://assets/audio/chapter02/score.json"))
+		for entry in rain_score.tracks: loop_points[entry.file]=entry
 	for track in TRACKS:
 		var player:=AudioStreamPlayer.new()
 		player.name=str(track).to_pascal_case()
@@ -40,6 +44,9 @@ func play_opening(restart: bool=false) -> void:
 func play_dance() -> void:
 	_play("dance",false)
 
+func play_rain() -> void:
+	_play("rain",false)
+
 func _exit_tree() -> void:
 	if is_instance_valid(fade): fade.kill()
 	for player in players.values(): player.stop()
@@ -54,6 +61,7 @@ func _play(track: String,restart: bool) -> void:
 		incoming.play()
 	var volume: float=dance_volume_db if track=="dance" else exploration_volume_db
 	if track=="opening": volume=opening_volume_db
+	if track=="rain": volume=-15.0
 	var outgoing: Dictionary={}
 	for other in players:
 		if other==track: continue

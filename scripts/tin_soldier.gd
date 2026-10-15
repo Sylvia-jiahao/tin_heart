@@ -24,6 +24,9 @@ var coyote_time: float = 0.0
 var jump_buffer: float = 0.0
 var external_wind_enabled: bool = false
 var external_wind: float = 0.0
+var environment_drift: float = 0.0
+var brace_drift_ratio: float = 0.0
+var wet_surface_slide: float = 0.0
 
 var state: String = "站立"
 var facing: float = 1.0
@@ -111,15 +114,18 @@ func _physics_process(delta: float) -> void:
 		air_wind_velocity=clampf(air_wind_velocity*decay+air_force*air_wind_gain*(1.0-decay)/drag,-air_wind_speed_limit,air_wind_speed_limit)
 		velocity.x=air_control_velocity+air_wind_velocity
 	elif braced:
-		velocity.x = 0.0
+		velocity.x = environment_drift*brace_drift_ratio
 		velocity.y = 0.0
 	elif locked:
-		velocity.x = 0.0
+		velocity.x = environment_drift
 		velocity.y = gravity * delta
 	elif velocity.y >= 0.0:
 		var desired := 0.0 if preparing and charge_time >= hold_threshold else direction * walk_speed
 		if external_wind_enabled:
 			desired += wind*0.48
+		desired += environment_drift
+		if grounded and wet_surface_slide>0.0:
+			desired += get_floor_normal().x*wet_surface_slide
 		velocity.x = desired if in_wind else move_toward(velocity.x, desired, 1600.0 * delta)
 		velocity.y = gravity * delta
 	# Wind and slippery slope are environmental motion, independent of animation.
@@ -164,6 +170,12 @@ func reset_at(at: Vector2) -> void:
 	coyote_time = 0.0
 	jump_buffer = 0.0
 	state = "站立"
+	clear_environment()
+
+func clear_environment() -> void:
+	environment_drift=0.0
+	brace_drift_ratio=0.0
+	wet_surface_slide=0.0
 
 func hold_standing() -> void:
 	# End the playable movement before the meeting shot, including residual landing poses.
@@ -181,6 +193,7 @@ func hold_standing() -> void:
 	last_landing_locked = false
 	wind = 0.0
 	in_wind = false
+	clear_environment()
 	body_art.rotation = 0.0
 	body_art.walk_phase = 0.0
 	body_art.salute_weight = 0.0

@@ -20,7 +20,10 @@ func verify() -> void:
 	check(absf(music.players.exploration.volume_db-music.exploration_volume_db)<0.1,"BGM fades in at the intended quiet volume")
 	for key in music.players:
 		var stream: AudioStreamWAV=music.players[key].stream
-		check(stream.loop_mode==AudioStreamWAV.LOOP_FORWARD and stream.loop_begin>0 and stream.loop_end>stream.loop_begin and stream.get_length()>50,"track uses baked tail/head bridge and an interior loop start: "+key)
+		if key=="rain":
+			check(stream.loop_mode==AudioStreamWAV.LOOP_FORWARD and stream.loop_begin==0 and stream.loop_end==2116800,"rain score uses its circularly synthesized 48-second loop")
+		else:
+			check(stream.loop_mode==AudioStreamWAV.LOOP_FORWARD and stream.loop_begin>0 and stream.loop_end>stream.loop_begin and stream.get_length()>50,"track uses baked tail/head bridge and an interior loop start: "+key)
 	var font: Font=chapter.title.get_theme_font("font")
 	check("nani" in font.get_font_name().to_lower() or "何某" in font.get_font_name(),"title uses Nani handwriting font: "+font.get_font_name())
 	check(chapter.title.get_theme_color("font_color")==Color.BLACK and chapter.journey.heading.get_theme_color("font_color")==Color.BLACK,"text is black with the new font's native solid strokes")
